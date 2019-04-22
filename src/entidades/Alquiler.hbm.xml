@@ -1,0 +1,51 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 22-abr-2019 23:38:10 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="entidades.Alquiler" table="Alquiler" catalog="ScooterAPP" optimistic-lock="version">
+        <id name="id" type="java.lang.Integer">
+            <column name="id" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="alquiler" class="entidades.Alquiler" fetch="select">
+            <column name="scooter_id" not-null="true" />
+        </many-to-one>
+        <many-to-one name="cliente" class="entidades.Cliente" fetch="select">
+            <column name="cliente_id" not-null="true" />
+        </many-to-one>
+        <property name="fechaInicio" type="timestamp">
+            <column name="fechaInicio" length="19" not-null="true" />
+        </property>
+        <property name="fechaFin" type="timestamp">
+            <column name="fechaFin" length="19" not-null="true" />
+        </property>
+        <property name="minutosConducidos" type="java.lang.Integer">
+            <column name="minutosConducidos" />
+        </property>
+        <property name="minutosParada" type="java.lang.Integer">
+            <column name="minutosParada" />
+        </property>
+        <property name="costeTotal" type="double">
+            <column name="costeTotal" precision="6" not-null="true" />
+        </property>
+        <set name="alquilers" table="Alquiler" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="scooter_id" not-null="true" />
+            </key>
+            <one-to-many class="entidades.Alquiler" />
+        </set>
+        <set name="estadoScooters" table="EstadoScooter" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="alquiler_id" not-null="true" />
+            </key>
+            <one-to-many class="entidades.EstadoScooter" />
+        </set>
+        <set name="incidencias" table="Incidencia" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="alquiler_id" />
+            </key>
+            <one-to-many class="entidades.Incidencia" />
+        </set>
+    </class>
+</hibernate-mapping>

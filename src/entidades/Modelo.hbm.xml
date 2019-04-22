@@ -1,0 +1,24 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 22-abr-2019 23:38:10 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="entidades.Modelo" table="Modelo" catalog="ScooterAPP" optimistic-lock="version">
+        <id name="id" type="java.lang.Integer">
+            <column name="id" />
+            <generator class="identity" />
+        </id>
+        <property name="marca" type="string">
+            <column name="marca" length="30" not-null="true" />
+        </property>
+        <property name="modelo" type="string">
+            <column name="modelo" length="30" not-null="true" />
+        </property>
+        <set name="scooters" table="Scooter" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="modelo_id" not-null="true" />
+            </key>
+            <one-to-many class="entidades.Scooter" />
+        </set>
+    </class>
+</hibernate-mapping>

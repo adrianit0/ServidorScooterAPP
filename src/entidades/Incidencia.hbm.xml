@@ -1,0 +1,36 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 22-abr-2019 23:38:10 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="entidades.Incidencia" table="Incidencia" catalog="ScooterAPP" optimistic-lock="version">
+        <id name="id" type="java.lang.Integer">
+            <column name="id" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="alquiler" class="entidades.Alquiler" fetch="select">
+            <column name="alquiler_id" />
+        </many-to-one>
+        <many-to-one name="cliente" class="entidades.Cliente" fetch="select">
+            <column name="cliente_id" not-null="true" />
+        </many-to-one>
+        <many-to-one name="tipoIncidencia" class="entidades.TipoIncidencia" fetch="select">
+            <column name="tipoIncidencia_id" not-null="true" />
+        </many-to-one>
+        <property name="descripcion" type="string">
+            <column name="descripcion" length="300" />
+        </property>
+        <property name="posicionLat" type="java.lang.Integer">
+            <column name="posicionLat" />
+        </property>
+        <property name="posicionAlt" type="java.lang.Integer">
+            <column name="posicionAlt" />
+        </property>
+        <set name="imagens" table="Imagen" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="incidencia_id" not-null="true" />
+            </key>
+            <one-to-many class="entidades.Imagen" />
+        </set>
+    </class>
+</hibernate-mapping>

@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 22-abr-2019 23:38:10 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="entidades.Sede" table="Sede" catalog="ScooterAPP" optimistic-lock="version">
+        <id name="id" type="java.lang.Integer">
+            <column name="id" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="ciudad" class="entidades.Ciudad" fetch="select">
+            <column name="ciudad_id" not-null="true" />
+        </many-to-one>
+        <property name="nombre" type="string">
+            <column name="nombre" length="30" not-null="true" />
+        </property>
+        <property name="direccion" type="string">
+            <column name="direccion" length="60" not-null="true" />
+        </property>
+        <set name="scooters" table="Asignado" inverse="false" lazy="true" fetch="select">
+            <key>
+                <column name="sede_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="entidades.Scooter">
+                <column name="scooter_id" not-null="true" />
+            </many-to-many>
+        </set>
+    </class>
+</hibernate-mapping>

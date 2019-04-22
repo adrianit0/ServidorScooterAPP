@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 22-abr-2019 23:38:10 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="entidades.Scooter" table="Scooter" catalog="ScooterAPP" optimistic-lock="version">
+        <id name="id" type="java.lang.Integer">
+            <column name="id" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="modelo" class="entidades.Modelo" fetch="select">
+            <column name="modelo_id" not-null="true" />
+        </many-to-one>
+        <property name="matricula" type="string">
+            <column name="matricula" length="7" not-null="true" unique="true" />
+        </property>
+        <property name="codigo" type="int">
+            <column name="codigo" not-null="true" unique="true" />
+        </property>
+        <property name="fechaCompra" type="date">
+            <column name="fechaCompra" length="10" not-null="true" />
+        </property>
+        <property name="precioCompra" type="double">
+            <column name="precioCompra" precision="8" not-null="true" />
+        </property>
+        <property name="posicionLat" type="java.lang.Integer">
+            <column name="posicionLat" />
+        </property>
+        <property name="posicionAlt" type="java.lang.Integer">
+            <column name="posicionAlt" />
+        </property>
+        <set name="estadoScooters" table="EstadoScooter" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="scooter_id" not-null="true" />
+            </key>
+            <one-to-many class="entidades.EstadoScooter" />
+        </set>
+        <set name="sedes" table="Asignado" inverse="false" lazy="true" fetch="select">
+            <key>
+                <column name="scooter_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="entidades.Sede">
+                <column name="sede_id" not-null="true" />
+            </many-to-many>
+        </set>
+    </class>
+</hibernate-mapping>

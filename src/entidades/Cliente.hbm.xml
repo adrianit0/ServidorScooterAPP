@@ -1,0 +1,57 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 22-abr-2019 23:38:10 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="entidades.Cliente" table="Cliente" catalog="ScooterAPP" optimistic-lock="version">
+        <id name="id" type="java.lang.Integer">
+            <column name="id" />
+            <generator class="identity" />
+        </id>
+        <property name="nombre" type="string">
+            <column name="nombre" length="30" not-null="true" />
+        </property>
+        <property name="apellido1" type="string">
+            <column name="apellido1" length="30" not-null="true" />
+        </property>
+        <property name="apellido2" type="string">
+            <column name="apellido2" length="30" />
+        </property>
+        <property name="nick" type="string">
+            <column name="nick" length="30" not-null="true" unique="true" />
+        </property>
+        <property name="email" type="string">
+            <column name="email" length="30" not-null="true" unique="true" />
+        </property>
+        <property name="pass" type="string">
+            <column name="pass" length="30" not-null="true" />
+        </property>
+        <property name="minutos" type="int">
+            <column name="minutos" not-null="true" />
+        </property>
+        <property name="activada" type="byte">
+            <column name="activada" not-null="true" />
+        </property>
+        <property name="fechaCreacion" type="timestamp">
+            <column name="fechaCreacion" length="19" not-null="true" />
+        </property>
+        <set name="incidencias" table="Incidencia" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="cliente_id" not-null="true" />
+            </key>
+            <one-to-many class="entidades.Incidencia" />
+        </set>
+        <set name="alquilers" table="Alquiler" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="cliente_id" not-null="true" />
+            </key>
+            <one-to-many class="entidades.Alquiler" />
+        </set>
+        <set name="historialCompras" table="HistorialCompra" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="cliente_id" not-null="true" />
+            </key>
+            <one-to-many class="entidades.HistorialCompra" />
+        </set>
+    </class>
+</hibernate-mapping>
