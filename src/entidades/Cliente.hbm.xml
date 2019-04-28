@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 22-abr-2019 23:38:10 by Hibernate Tools 4.3.1 -->
+<!-- Generated 28-abr-2019 23:19:04 by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
-    <class name="entidades.Cliente" table="Cliente" catalog="ScooterAPP" optimistic-lock="version">
+    <class name="entidades.Cliente" table="cliente" catalog="scooterapp" optimistic-lock="version">
         <id name="id" type="java.lang.Integer">
             <column name="id" />
             <generator class="identity" />
@@ -35,23 +35,23 @@
         <property name="fechaCreacion" type="timestamp">
             <column name="fechaCreacion" length="19" not-null="true" />
         </property>
-        <set name="incidencias" table="Incidencia" inverse="true" lazy="true" fetch="select">
+        <set name="incidencias" table="incidencia" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="cliente_id" not-null="true" />
             </key>
             <one-to-many class="entidades.Incidencia" />
         </set>
-        <set name="alquilers" table="Alquiler" inverse="true" lazy="true" fetch="select">
+        <set name="alquilers" table="alquiler" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="cliente_id" not-null="true" />
             </key>
             <one-to-many class="entidades.Alquiler" />
         </set>
-        <set name="historialCompras" table="HistorialCompra" inverse="true" lazy="true" fetch="select">
+        <set name="historialcompras" table="historialcompra" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="cliente_id" not-null="true" />
             </key>
-            <one-to-many class="entidades.HistorialCompra" />
+            <one-to-many class="entidades.Historialcompra" />
         </set>
     </class>
 </hibernate-mapping>

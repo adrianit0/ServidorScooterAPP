@@ -1,5 +1,5 @@
 package entidades;
-// Generated 22-abr-2019 23:38:06 by Hibernate Tools 4.3.1
+// Generated 28-abr-2019 23:19:03 by Hibernate Tools 4.3.1
 
 
 import java.util.Date;
@@ -24,7 +24,7 @@ public class Cliente  implements java.io.Serializable {
      private Date fechaCreacion;
      private Set incidencias = new HashSet(0);
      private Set alquilers = new HashSet(0);
-     private Set historialCompras = new HashSet(0);
+     private Set historialcompras = new HashSet(0);
 
     public Cliente() {
     }
@@ -40,7 +40,7 @@ public class Cliente  implements java.io.Serializable {
         this.activada = activada;
         this.fechaCreacion = fechaCreacion;
     }
-    public Cliente(String nombre, String apellido1, String apellido2, String nick, String email, String pass, int minutos, byte activada, Date fechaCreacion, Set incidencias, Set alquilers, Set historialCompras) {
+    public Cliente(String nombre, String apellido1, String apellido2, String nick, String email, String pass, int minutos, byte activada, Date fechaCreacion, Set incidencias, Set alquilers, Set historialcompras) {
        this.nombre = nombre;
        this.apellido1 = apellido1;
        this.apellido2 = apellido2;
@@ -52,7 +52,7 @@ public class Cliente  implements java.io.Serializable {
        this.fechaCreacion = fechaCreacion;
        this.incidencias = incidencias;
        this.alquilers = alquilers;
-       this.historialCompras = historialCompras;
+       this.historialcompras = historialcompras;
     }
    
     public Integer getId() {
@@ -139,12 +139,12 @@ public class Cliente  implements java.io.Serializable {
     public void setAlquilers(Set alquilers) {
         this.alquilers = alquilers;
     }
-    public Set getHistorialCompras() {
-        return this.historialCompras;
+    public Set getHistorialcompras() {
+        return this.historialcompras;
     }
     
-    public void setHistorialCompras(Set historialCompras) {
-        this.historialCompras = historialCompras;
+    public void setHistorialcompras(Set historialcompras) {
+        this.historialcompras = historialcompras;
     }
 
 

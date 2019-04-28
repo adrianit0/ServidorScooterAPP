@@ -1,5 +1,5 @@
 package entidades;
-// Generated 22-abr-2019 23:38:06 by Hibernate Tools 4.3.1
+// Generated 28-abr-2019 23:19:03 by Hibernate Tools 4.3.1
 
 
 import java.util.HashSet;
@@ -14,7 +14,8 @@ public class Incidencia  implements java.io.Serializable {
      private Integer id;
      private Alquiler alquiler;
      private Cliente cliente;
-     private TipoIncidencia tipoIncidencia;
+     private Mantenimiento mantenimiento;
+     private Tipoincidencia tipoincidencia;
      private String descripcion;
      private Integer posicionLat;
      private Integer posicionAlt;
@@ -24,14 +25,15 @@ public class Incidencia  implements java.io.Serializable {
     }
 
 	
-    public Incidencia(Cliente cliente, TipoIncidencia tipoIncidencia) {
+    public Incidencia(Cliente cliente, Tipoincidencia tipoincidencia) {
         this.cliente = cliente;
-        this.tipoIncidencia = tipoIncidencia;
+        this.tipoincidencia = tipoincidencia;
     }
-    public Incidencia(Alquiler alquiler, Cliente cliente, TipoIncidencia tipoIncidencia, String descripcion, Integer posicionLat, Integer posicionAlt, Set imagens) {
+    public Incidencia(Alquiler alquiler, Cliente cliente, Mantenimiento mantenimiento, Tipoincidencia tipoincidencia, String descripcion, Integer posicionLat, Integer posicionAlt, Set imagens) {
        this.alquiler = alquiler;
        this.cliente = cliente;
-       this.tipoIncidencia = tipoIncidencia;
+       this.mantenimiento = mantenimiento;
+       this.tipoincidencia = tipoincidencia;
        this.descripcion = descripcion;
        this.posicionLat = posicionLat;
        this.posicionAlt = posicionAlt;
@@ -59,12 +61,19 @@ public class Incidencia  implements java.io.Serializable {
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
-    public TipoIncidencia getTipoIncidencia() {
-        return this.tipoIncidencia;
+    public Mantenimiento getMantenimiento() {
+        return this.mantenimiento;
     }
     
-    public void setTipoIncidencia(TipoIncidencia tipoIncidencia) {
-        this.tipoIncidencia = tipoIncidencia;
+    public void setMantenimiento(Mantenimiento mantenimiento) {
+        this.mantenimiento = mantenimiento;
+    }
+    public Tipoincidencia getTipoincidencia() {
+        return this.tipoincidencia;
+    }
+    
+    public void setTipoincidencia(Tipoincidencia tipoincidencia) {
+        this.tipoincidencia = tipoincidencia;
     }
     public String getDescripcion() {
         return this.descripcion;

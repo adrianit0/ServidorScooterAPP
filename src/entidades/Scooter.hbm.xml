@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 22-abr-2019 23:38:10 by Hibernate Tools 4.3.1 -->
+<!-- Generated 28-abr-2019 23:19:04 by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
-    <class name="entidades.Scooter" table="Scooter" catalog="ScooterAPP" optimistic-lock="version">
+    <class name="entidades.Scooter" table="scooter" catalog="scooterapp" optimistic-lock="version">
         <id name="id" type="java.lang.Integer">
             <column name="id" />
             <generator class="identity" />
@@ -29,19 +29,25 @@
         <property name="posicionAlt" type="java.lang.Integer">
             <column name="posicionAlt" />
         </property>
-        <set name="estadoScooters" table="EstadoScooter" inverse="true" lazy="true" fetch="select">
+        <set name="estadoscooters" table="estadoscooter" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="scooter_id" not-null="true" />
             </key>
-            <one-to-many class="entidades.EstadoScooter" />
+            <one-to-many class="entidades.Estadoscooter" />
         </set>
-        <set name="sedes" table="Asignado" inverse="false" lazy="true" fetch="select">
+        <set name="sedes" table="asignado" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="scooter_id" not-null="true" />
             </key>
             <many-to-many entity-name="entidades.Sede">
                 <column name="sede_id" not-null="true" />
             </many-to-many>
+        </set>
+        <set name="mantenimientos" table="mantenimiento" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="scooter_id" not-null="true" />
+            </key>
+            <one-to-many class="entidades.Mantenimiento" />
         </set>
     </class>
 </hibernate-mapping>

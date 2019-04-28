@@ -1,5 +1,5 @@
 package entidades;
-// Generated 22-abr-2019 23:38:06 by Hibernate Tools 4.3.1
+// Generated 28-abr-2019 23:19:03 by Hibernate Tools 4.3.1
 
 
 import java.util.Date;
@@ -20,8 +20,9 @@ public class Scooter  implements java.io.Serializable {
      private double precioCompra;
      private Integer posicionLat;
      private Integer posicionAlt;
-     private Set estadoScooters = new HashSet(0);
+     private Set estadoscooters = new HashSet(0);
      private Set sedes = new HashSet(0);
+     private Set mantenimientos = new HashSet(0);
 
     public Scooter() {
     }
@@ -34,7 +35,7 @@ public class Scooter  implements java.io.Serializable {
         this.fechaCompra = fechaCompra;
         this.precioCompra = precioCompra;
     }
-    public Scooter(Modelo modelo, String matricula, int codigo, Date fechaCompra, double precioCompra, Integer posicionLat, Integer posicionAlt, Set estadoScooters, Set sedes) {
+    public Scooter(Modelo modelo, String matricula, int codigo, Date fechaCompra, double precioCompra, Integer posicionLat, Integer posicionAlt, Set estadoscooters, Set sedes, Set mantenimientos) {
        this.modelo = modelo;
        this.matricula = matricula;
        this.codigo = codigo;
@@ -42,8 +43,9 @@ public class Scooter  implements java.io.Serializable {
        this.precioCompra = precioCompra;
        this.posicionLat = posicionLat;
        this.posicionAlt = posicionAlt;
-       this.estadoScooters = estadoScooters;
+       this.estadoscooters = estadoscooters;
        this.sedes = sedes;
+       this.mantenimientos = mantenimientos;
     }
    
     public Integer getId() {
@@ -102,12 +104,12 @@ public class Scooter  implements java.io.Serializable {
     public void setPosicionAlt(Integer posicionAlt) {
         this.posicionAlt = posicionAlt;
     }
-    public Set getEstadoScooters() {
-        return this.estadoScooters;
+    public Set getEstadoscooters() {
+        return this.estadoscooters;
     }
     
-    public void setEstadoScooters(Set estadoScooters) {
-        this.estadoScooters = estadoScooters;
+    public void setEstadoscooters(Set estadoscooters) {
+        this.estadoscooters = estadoscooters;
     }
     public Set getSedes() {
         return this.sedes;
@@ -115,6 +117,13 @@ public class Scooter  implements java.io.Serializable {
     
     public void setSedes(Set sedes) {
         this.sedes = sedes;
+    }
+    public Set getMantenimientos() {
+        return this.mantenimientos;
+    }
+    
+    public void setMantenimientos(Set mantenimientos) {
+        this.mantenimientos = mantenimientos;
     }
 
 

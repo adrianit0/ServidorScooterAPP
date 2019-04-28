@@ -148,6 +148,15 @@ CREATE TABLE IF NOT EXISTS TipoIncidencia (
     descripcion VARCHAR(300) NOT NULL
 ) ENGINE=INNODB;
 
+CREATE TABLE IF NOT EXISTS Mantenimiento (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    fecha_inicio TIMESTAMP NOT NULL,
+    fecha_fin TIMESTAMP NOT NULL, -- Por defecto 8h de la hora de inicio.
+    scooter_id INT NOT NULL,
+    CONSTRAINT scmafk FOREIGN KEY (scooter_id) REFERENCES Scooter(id)
+    
+) ENGINE=INNODB;
+
 CREATE TABLE IF NOT EXISTS Incidencia (
     id INT PRIMARY KEY AUTO_INCREMENT,
     descripcion VARCHAR(300),
@@ -158,9 +167,11 @@ CREATE TABLE IF NOT EXISTS Incidencia (
     tipoIncidencia_id INT NOT NULL,
     cliente_id INT NOT NULL,
     alquiler_id INT,
+    mantenimiento_id INT,
     CONSTRAINT tiinfk FOREIGN KEY (tipoIncidencia_id) REFERENCES TipoIncidencia(id),
     CONSTRAINT clinfk FOREIGN KEY (cliente_id) REFERENCES Cliente(id),
-    CONSTRAINT alinfk FOREIGN KEY (alquiler_id) REFERENCES Alquiler(id)
+    CONSTRAINT alinfk FOREIGN KEY (alquiler_id) REFERENCES Alquiler(id),
+    CONSTRAINT mainfk FOREIGN KEY (mantenimiento_id) REFERENCES Mantenimiento(id)
 ) ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS Imagen (
@@ -169,4 +180,67 @@ CREATE TABLE IF NOT EXISTS Imagen (
     url VARCHAR(30) NOT NULl,
     incidencia_id INT NOT NULL,
     CONSTRAINT inimfk FOREIGN KEY (incidencia_id) REFERENCES Incidencia(id)
+) ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS Puesto (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(30) NOT NULL,
+    descripcion VARCHAR(2000)
+) ENGINE=INNODB;
+
+CREATE TABLE IF NOT EXISTS Empleado (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(30) NOT NULL,
+    apellido1 VARCHAR(30) NOT NULL,
+    apellido2 VARCHAR(30),
+    dni VARCHAR(9) NOT NULL UNIQUE,
+    direccion VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL,
+    pass VARCHAR(100) NOT NULL,
+    sueldo DOUBLE(8,2) NOT NULL,
+    puesto_id INT NOT NULL,
+    ciudad_id INT NOT NULL,
+    sede_id INT NOT NULL,
+    CONSTRAINT puemfk FOREIGN KEY (puesto_id) REFERENCES Puesto(id),
+    CONSTRAINT ciemfk FOREIGN KEY (ciudad_id) REFERENCES Ciudad(id),
+    CONSTRAINT seemfk FOREIGN KEY (sede_id) REFERENCES Sede(id)
+) ENGINE=INNODB;
+
+CREATE TABLE EstadoTarea (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(30) NOT NULL,
+    descripcion VARCHAR(2000) NOT NULL
+) ENGINE=INNODB;
+
+CREATE TABLE TipoTarea (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(50) NOT NULL
+) ENGINE=INNODB;
+
+CREATE TABLE Tarea (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    nombre VARCHAR(60) NOT NULL,
+    fecha_asignacion TIMESTAMP NOT NULL,
+    estimacion INT NOT NULL, -- EL tiempo en minutos
+    empleado_id INT NOT NULL,
+    tipoTarea_id INT NOT NULL,
+    estadoTarea_id INT NOT NULL,
+    CONSTRAINT emtafk FOREIGN KEY (empleado_id) REFERENCES Empleado(id),
+    CONSTRAINT titafk FOREIGN KEY (tipoTarea_id) REFERENCES TipoTarea(id),
+    CONSTRAINT estafk FOREIGN KEY (estadoTarea_id) REFERENCES EstadoTarea(id)
+) ENGINE=INNODB;
+
+CREATE TABLE Horario (
+    id INT PRIMARY KEY AUTO_INCREMENT,
+    diaSemana INT NOT NULL, -- Siendo 0 lunes y 6 domingo
+    horaInicio INT NOT NULL,    -- Min 00, Max 23
+    horaFin INT NOT NULL        -- Min 00, Max 23
+) ENGINE=INNODB;
+
+CREATE TABLE HorarioEmpleado (
+    empleado_id INT NOT NULL,
+    horario_id INT NOT NULL,
+    PRIMARY KEY(empleado_id, horario_id),
+    CONSTRAINT emhofk FOREIGN KEY (empleado_id) REFERENCES Empleado(id),
+    CONSTRAINT hohofk FOREIGN KEY (horario_id) REFERENCES Horario(id)
 ) ENGINE=INNODB;

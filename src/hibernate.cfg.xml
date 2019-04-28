@@ -45,19 +45,28 @@ Contributor(s):
     <property name="hibernate.connection.driver_class">com.mysql.jdbc.Driver</property>
     <property name="hibernate.connection.url">jdbc:mysql://localhost:3306/ScooterAPP?zeroDateTimeBehavior=convertToNull</property>
     <property name="hibernate.connection.username">root</property>
-    <mapping resource="entidades/EstadoAlquiler.hbm.xml"/>
-    <mapping resource="entidades/Descuento.hbm.xml"/>
-    <mapping resource="entidades/Ciudad.hbm.xml"/>
-    <mapping resource="entidades/Bono.hbm.xml"/>
-    <mapping resource="entidades/Imagen.hbm.xml"/>
-    <mapping resource="entidades/Modelo.hbm.xml"/>
-    <mapping resource="entidades/EstadoScooter.hbm.xml"/>
-    <mapping resource="entidades/HistorialCompra.hbm.xml"/>
-    <mapping resource="entidades/Sede.hbm.xml"/>
-    <mapping resource="entidades/Cliente.hbm.xml"/>
-    <mapping resource="entidades/Incidencia.hbm.xml"/>
-    <mapping resource="entidades/Scooter.hbm.xml"/>
+    <property name="hibernate.connection.password">root</property>
+    
     <mapping resource="entidades/Alquiler.hbm.xml"/>
-    <mapping resource="entidades/TipoIncidencia.hbm.xml"/>
+    <mapping resource="entidades/Tarea.hbm.xml"/>
+    <mapping resource="entidades/Modelo.hbm.xml"/>
+    <mapping resource="entidades/Sede.hbm.xml"/>
+    <mapping resource="entidades/Tipotarea.hbm.xml"/>
+    <mapping resource="entidades/Estadotarea.hbm.xml"/>
+    <mapping resource="entidades/Bono.hbm.xml"/>
+    <mapping resource="entidades/Mantenimiento.hbm.xml"/>
+    <mapping resource="entidades/Cliente.hbm.xml"/>
+    <mapping resource="entidades/Historialcompra.hbm.xml"/>
+    <mapping resource="entidades/Incidencia.hbm.xml"/>
+    <mapping resource="entidades/Estadoscooter.hbm.xml"/>
+    <mapping resource="entidades/Tipoincidencia.hbm.xml"/>
+    <mapping resource="entidades/Ciudad.hbm.xml"/>
+    <mapping resource="entidades/Horario.hbm.xml"/>
+    <mapping resource="entidades/Imagen.hbm.xml"/>
+    <mapping resource="entidades/Estadoalquiler.hbm.xml"/>
+    <mapping resource="entidades/Scooter.hbm.xml"/>
+    <mapping resource="entidades/Empleado.hbm.xml"/>
+    <mapping resource="entidades/Descuento.hbm.xml"/>
+    <mapping resource="entidades/Puesto.hbm.xml"/>
   </session-factory>
 </hibernate-configuration>

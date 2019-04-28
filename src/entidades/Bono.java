@@ -1,5 +1,5 @@
 package entidades;
-// Generated 22-abr-2019 23:38:06 by Hibernate Tools 4.3.1
+// Generated 28-abr-2019 23:19:03 by Hibernate Tools 4.3.1
 
 
 import java.util.HashSet;
@@ -16,7 +16,7 @@ public class Bono  implements java.io.Serializable {
      private String descripcion;
      private int minutos;
      private double precio;
-     private Set historialCompras = new HashSet(0);
+     private Set historialcompras = new HashSet(0);
      private Set descuentos = new HashSet(0);
 
     public Bono() {
@@ -29,12 +29,12 @@ public class Bono  implements java.io.Serializable {
         this.minutos = minutos;
         this.precio = precio;
     }
-    public Bono(String nombre, String descripcion, int minutos, double precio, Set historialCompras, Set descuentos) {
+    public Bono(String nombre, String descripcion, int minutos, double precio, Set historialcompras, Set descuentos) {
        this.nombre = nombre;
        this.descripcion = descripcion;
        this.minutos = minutos;
        this.precio = precio;
-       this.historialCompras = historialCompras;
+       this.historialcompras = historialcompras;
        this.descuentos = descuentos;
     }
    
@@ -73,12 +73,12 @@ public class Bono  implements java.io.Serializable {
     public void setPrecio(double precio) {
         this.precio = precio;
     }
-    public Set getHistorialCompras() {
-        return this.historialCompras;
+    public Set getHistorialcompras() {
+        return this.historialcompras;
     }
     
-    public void setHistorialCompras(Set historialCompras) {
-        this.historialCompras = historialCompras;
+    public void setHistorialcompras(Set historialcompras) {
+        this.historialcompras = historialcompras;
     }
     public Set getDescuentos() {
         return this.descuentos;

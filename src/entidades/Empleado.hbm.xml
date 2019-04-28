@@ -1,0 +1,59 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 28-abr-2019 23:19:04 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="entidades.Empleado" table="empleado" catalog="scooterapp" optimistic-lock="version">
+        <id name="id" type="java.lang.Integer">
+            <column name="id" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="ciudad" class="entidades.Ciudad" fetch="select">
+            <column name="ciudad_id" not-null="true" />
+        </many-to-one>
+        <many-to-one name="puesto" class="entidades.Puesto" fetch="select">
+            <column name="puesto_id" not-null="true" />
+        </many-to-one>
+        <many-to-one name="sede" class="entidades.Sede" fetch="select">
+            <column name="sede_id" not-null="true" />
+        </many-to-one>
+        <property name="nombre" type="string">
+            <column name="nombre" length="30" not-null="true" />
+        </property>
+        <property name="apellido1" type="string">
+            <column name="apellido1" length="30" not-null="true" />
+        </property>
+        <property name="apellido2" type="string">
+            <column name="apellido2" length="30" />
+        </property>
+        <property name="dni" type="string">
+            <column name="dni" length="9" not-null="true" unique="true" />
+        </property>
+        <property name="direccion" type="string">
+            <column name="direccion" length="100" not-null="true" />
+        </property>
+        <property name="email" type="string">
+            <column name="email" length="100" not-null="true" />
+        </property>
+        <property name="pass" type="string">
+            <column name="pass" length="100" not-null="true" />
+        </property>
+        <property name="sueldo" type="double">
+            <column name="sueldo" precision="8" not-null="true" />
+        </property>
+        <set name="tareas" table="tarea" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="empleado_id" not-null="true" />
+            </key>
+            <one-to-many class="entidades.Tarea" />
+        </set>
+        <set name="horarios" table="horarioempleado" inverse="false" lazy="true" fetch="select">
+            <key>
+                <column name="empleado_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="entidades.Horario">
+                <column name="horario_id" not-null="true" />
+            </many-to-many>
+        </set>
+    </class>
+</hibernate-mapping>

@@ -1,5 +1,5 @@
 package entidades;
-// Generated 22-abr-2019 23:38:06 by Hibernate Tools 4.3.1
+// Generated 28-abr-2019 23:19:03 by Hibernate Tools 4.3.1
 
 
 import java.util.HashSet;
@@ -16,6 +16,7 @@ public class Sede  implements java.io.Serializable {
      private String nombre;
      private String direccion;
      private Set scooters = new HashSet(0);
+     private Set empleados = new HashSet(0);
 
     public Sede() {
     }
@@ -26,11 +27,12 @@ public class Sede  implements java.io.Serializable {
         this.nombre = nombre;
         this.direccion = direccion;
     }
-    public Sede(Ciudad ciudad, String nombre, String direccion, Set scooters) {
+    public Sede(Ciudad ciudad, String nombre, String direccion, Set scooters, Set empleados) {
        this.ciudad = ciudad;
        this.nombre = nombre;
        this.direccion = direccion;
        this.scooters = scooters;
+       this.empleados = empleados;
     }
    
     public Integer getId() {
@@ -67,6 +69,13 @@ public class Sede  implements java.io.Serializable {
     
     public void setScooters(Set scooters) {
         this.scooters = scooters;
+    }
+    public Set getEmpleados() {
+        return this.empleados;
+    }
+    
+    public void setEmpleados(Set empleados) {
+        this.empleados = empleados;
     }
 
 

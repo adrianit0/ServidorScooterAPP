@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 28-abr-2019 23:19:04 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="entidades.Horario" table="horario" catalog="scooterapp" optimistic-lock="version">
+        <id name="id" type="java.lang.Integer">
+            <column name="id" />
+            <generator class="identity" />
+        </id>
+        <property name="diaSemana" type="int">
+            <column name="diaSemana" not-null="true" />
+        </property>
+        <property name="horaInicio" type="int">
+            <column name="horaInicio" not-null="true" />
+        </property>
+        <property name="horaFin" type="int">
+            <column name="horaFin" not-null="true" />
+        </property>
+        <set name="empleados" table="horarioempleado" inverse="false" lazy="true" fetch="select">
+            <key>
+                <column name="horario_id" not-null="true" />
+            </key>
+            <many-to-many entity-name="entidades.Empleado">
+                <column name="empleado_id" not-null="true" />
+            </many-to-many>
+        </set>
+    </class>
+</hibernate-mapping>

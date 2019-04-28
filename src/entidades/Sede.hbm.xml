@@ -1,9 +1,8 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 22-abr-2019 23:38:10 by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
-    <class name="entidades.Sede" table="Sede" catalog="ScooterAPP" optimistic-lock="version">
+    <class name="entidades.Sede" table="sede" catalog="scooterapp" optimistic-lock="version">
         <id name="id" type="java.lang.Integer">
             <column name="id" />
             <generator class="identity" />
@@ -17,13 +16,19 @@
         <property name="direccion" type="string">
             <column name="direccion" length="60" not-null="true" />
         </property>
-        <set name="scooters" table="Asignado" inverse="false" lazy="true" fetch="select">
+        <set name="scooters" table="asignado" inverse="false" lazy="true" fetch="select">
             <key>
                 <column name="sede_id" not-null="true" />
             </key>
             <many-to-many entity-name="entidades.Scooter">
                 <column name="scooter_id" not-null="true" />
             </many-to-many>
+        </set>
+        <set name="empleados" table="empleado" inverse="true" lazy="true" fetch="select">
+            <key>
+                <column name="sede_id" not-null="true" />
+            </key>
+            <one-to-many class="entidades.Empleado" />
         </set>
     </class>
 </hibernate-mapping>

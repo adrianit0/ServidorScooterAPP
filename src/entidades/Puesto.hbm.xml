@@ -3,7 +3,7 @@
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <!-- Generated 28-abr-2019 23:19:04 by Hibernate Tools 4.3.1 -->
 <hibernate-mapping>
-    <class name="entidades.Ciudad" table="ciudad" catalog="scooterapp" optimistic-lock="version">
+    <class name="entidades.Puesto" table="puesto" catalog="scooterapp" optimistic-lock="version">
         <id name="id" type="java.lang.Integer">
             <column name="id" />
             <generator class="identity" />
@@ -11,18 +11,12 @@
         <property name="nombre" type="string">
             <column name="nombre" length="30" not-null="true" />
         </property>
-        <property name="provincia" type="string">
-            <column name="provincia" length="30" not-null="true" />
+        <property name="descripcion" type="string">
+            <column name="descripcion" length="2000" />
         </property>
-        <set name="sedes" table="sede" inverse="true" lazy="true" fetch="select">
-            <key>
-                <column name="ciudad_id" not-null="true" />
-            </key>
-            <one-to-many class="entidades.Sede" />
-        </set>
         <set name="empleados" table="empleado" inverse="true" lazy="true" fetch="select">
             <key>
-                <column name="ciudad_id" not-null="true" />
+                <column name="puesto_id" not-null="true" />
             </key>
             <one-to-many class="entidades.Empleado" />
         </set>
