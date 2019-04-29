@@ -233,8 +233,8 @@ CREATE TABLE Tarea (
 CREATE TABLE Horario (
     id INT PRIMARY KEY AUTO_INCREMENT,
     diaSemana INT NOT NULL, -- Siendo 0 lunes y 6 domingo
-    horaInicio INT NOT NULL,    -- Min 00, Max 23
-    horaFin INT NOT NULL        -- Min 00, Max 23
+    horaInicio INT(2) NOT NULL,    -- Min 00, Max 23
+    horaFin INT(2) NOT NULL        -- Min 00, Max 23
 ) ENGINE=INNODB;
 
 CREATE TABLE HorarioEmpleado (

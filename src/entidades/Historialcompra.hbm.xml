@@ -1,0 +1,27 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+"http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<!-- Generated 28-abr-2019 23:19:04 by Hibernate Tools 4.3.1 -->
+<hibernate-mapping>
+    <class name="entidades.Historialcompra" table="historialcompra" catalog="scooterapp" optimistic-lock="version">
+        <id name="id" type="java.lang.Integer">
+            <column name="id" />
+            <generator class="identity" />
+        </id>
+        <many-to-one name="bono" class="entidades.Bono" fetch="select">
+            <column name="bono_id" not-null="true" />
+        </many-to-one>
+        <many-to-one name="cliente" class="entidades.Cliente" fetch="select">
+            <column name="cliente_id" not-null="true" />
+        </many-to-one>
+        <property name="fecha" type="timestamp">
+            <column name="fecha" length="19" not-null="true" />
+        </property>
+        <property name="precio" type="double">
+            <column name="precio" precision="5" not-null="true" />
+        </property>
+        <property name="minutos" type="int">
+            <column name="minutos" not-null="true" />
+        </property>
+    </class>
+</hibernate-mapping>
