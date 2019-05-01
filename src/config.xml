@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- CREAR DTD -->
+<configuration-mapper>
+    <!-- Propiedades de conexión -->
+    <properties>
+        <!-- Link donde efectuará la conexión -->
+        <url>192.168.1.1</url>
+        <port>4444</port>
+        <!-- Contenido avanzado que añadir
+       
+        <debug-notificaciones>true</debug-notificaciones>
+        <debug-errores>true</debug-errores>
+        -->
+        <!-- TODO: Seguir incluyendo más contenido --> 
+    </properties>
+    
+    <!-- Mapeador de contenido -->
+    <mappers>
+        <!-- Método que se ejecutará en el servidor por llamada del cliente de manera reflexiva -->
+        <!-- return es lo que devuelve, si pones ... significa que será un array de lo que devuelves-->
+        <mapping link="ejecutar" className="configuration_server.Ejecutador" method="Metodo" return="string..." token="true" >
+            <!-- Parámetros de entrada del método -->
+            <params>
+                <param type="string" />
+                <!-- <param type="int" /> -->
+            </params>
+            <!-- Quien puede acceder al contenido, si la lista está vacía podrá acceder todos, en caso contrario solo los que esten incluidos dentro -->
+            <!-- La white list permite filtrar tanto por rol como por estado -->
+            <white-list>
+               <role name="user" />
+               <role name="admin" />
+               
+               <state name="reservando" />
+               <state name="alquilando" />
+            </white-list>
+            <!-- Quien NO puede acceder al contenido, si la lista está vacía no restringirá a nadie -->
+            <!-- Se puede discriminar tanto por el rol de quien ejecuta el método como por el estado en el que se encuentra en el servidor -->
+            <black-list>
+                <role name="tecnico" />
+                
+                <state name="en el menu" />
+            </black-list>
+        </mapping>
+    </mappers>
+</configuration-mapper>

@@ -29,6 +29,8 @@ public class Principal {
             System.err.println("No puedo escuchar el puerto: 4444.");
             return;
         }
+        
+        System.out.println("Se inicia el servidor, empieza a buscar clientes.");
 
         while (listening)
 	    new ScooterServerThread(serverSocket.accept(), servidorUDP).start();

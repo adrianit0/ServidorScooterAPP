@@ -5,6 +5,7 @@
  */
 package servidor;
 
+import servidorbd.ScooterBBDD;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -117,7 +118,7 @@ public class ScooterServerUDP extends Thread{
                     return Util.encode(CODIGO.error, "El usuario "+ contenido[1]+ " ya existe. Elije otro");
                 }
                 
-                id = bd.registrarCliente(contenido[1], contenido[2]);
+                id = bd.registrarCliente(contenido[1], "Garcia", "Gonzalez", "test0", "adrian@scooterapp.com", contenido[2]);
                 if (id>=0) {
                     // DEVOLVER TAMBIEN EL ROL QUE TIENE
                     ClienteInfo nuevoCliente = new ClienteInfo (id, contenido[1], System.currentTimeMillis(), 0); // <- Cambiar

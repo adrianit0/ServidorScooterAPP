@@ -1,5 +1,5 @@
 
-package servidorUtil;
+package servidorbd;
 
 import java.sql.CallableStatement;
 import java.sql.Connection;
@@ -15,7 +15,7 @@ import java.sql.SQLException;
  * 
  * @author adrian
  */
-public class Servidor {
+public class ConexionBBDD {
     
     enum SGBD { 
         auto,
@@ -45,17 +45,17 @@ public class Servidor {
     private String url = "//localhost:3306/";
     
     private String user = "root"; 
-    private String password = "";
+    private String password = "root";
     private String bbdd = "scooterapp";
     
     private Connection connection=null;
     private CallableStatement callConnection=null;
     
-    public Servidor () {
+    public ConexionBBDD () {
         this ("", "");
     }
     
-    public Servidor (String comando, String bbdd, String... valores) {
+    public ConexionBBDD (String comando, String bbdd, String... valores) {
         this.bbdd = bbdd;
         this.consulta = comando;
         this.valores = valores;
