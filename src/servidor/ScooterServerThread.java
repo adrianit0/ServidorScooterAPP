@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
+import util.Paquete;
 import util.Util;
 import util.Util.CODIGO;
 
@@ -21,9 +22,7 @@ public class ScooterServerThread extends Thread {
 
     private Socket socket = null;
     private ScooterServerUDP servidor;
-    // Token del cliente
-    private String token;
-
+    
     public ScooterServerThread(Socket socket, ScooterServerUDP servidor) {
 	super("AhorcadoMultiServer");
 	this.socket = socket;
@@ -39,14 +38,18 @@ public class ScooterServerThread extends Thread {
             
             while ((inputLine = in.readLine()) != null) {
                 
-                outputLine = processInput(inputLine);
-                out.println(outputLine);
+                //outputLine = processInput(inputLine);
+                //out.println(outputLine);
                 
-                String[] mensaje = Util.decode(inputLine);
-                CODIGO cod = (mensaje.length>0) ? CODIGO.fromCode(mensaje[0]) : CODIGO.desconectar;
-                
-                if (cod==CODIGO.desconectar)
+                Paquete paquete = Util.unpack(inputLine);
+                CODIGO cod = paquete.getCodigo();
+                if (cod==null || cod==CODIGO.desconectar) {
+                    System.err.println("Thread desconectado, COD: " + cod);
                     break;
+                }
+                
+                
+                //out.println(outputLine);
             }
             socket.close();
             System.out.println("Thread cerrado");
@@ -55,16 +58,4 @@ public class ScooterServerThread extends Thread {
         }
     }
     
-    public String processInput(String in) {
-        String out = "";
-
-        boolean puedeRealizarAccion = servidor.puedeRealizarAccion(in);
-        if (puedeRealizarAccion) {
-            token = in;
-        } else {
-            return Util.encode(CODIGO.error, "Token no permitido");
-        }
-        
-        return out;
-    }
 }

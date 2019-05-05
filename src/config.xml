@@ -6,19 +6,21 @@
         <!-- Link donde efectuará la conexión -->
         <url>192.168.1.1</url>
         <port>4444</port>
-        <!-- Contenido avanzado que añadir
-       
-        <debug-notificaciones>true</debug-notificaciones>
-        <debug-errores>true</debug-errores>
-        -->
-        <!-- TODO: Seguir incluyendo más contenido --> 
+        <!-- TODO: Seguir incluyendo más contenido para la configuración --> 
     </properties>
     
-    <!-- Mapeador de contenido -->
+    <!-- Mapeador de DTO -->
+    <!-- TODO: Programar esta parte -->
+    <objects>
+        <object resource="DTO/UsuarioDTO.xml" />
+        <!-- Seguir metiendo DTO -->
+    </objects>
+    
+    <!-- Mapeador de métodos con URI -->
     <mappers>
         <!-- Método que se ejecutará en el servidor por llamada del cliente de manera reflexiva -->
         <!-- return es lo que devuelve, si pones ... significa que será un array de lo que devuelves-->
-        <mapping link="ejecutar" className="configuration_server.Ejecutador" method="Metodo" return="string..." token="true" >
+        <mapping link="ejecutar" className="testing.Ejecutador" method="Metodo" return="string..." token="true" >
             <!-- Parámetros de entrada del método -->
             <params>
                 <param type="string" />
@@ -38,8 +40,20 @@
             <black-list>
                 <role name="tecnico" />
                 
-                <state name="en el menu" />
+                <state name="enElMenu" />
             </black-list>
+        </mapping>
+        
+        <mapping link="test" className="testing.Ejecutador" method="test" return="String" token="false" >
+            <params>
+                <param type="string" />
+            </params>
+        </mapping>
+        
+        <mapping link="login" className="controller.UsuarioController" method="login" return="map" token="false">
+            <params>
+                <param type="parameters" />
+            </params>
         </mapping>
     </mappers>
 </configuration-mapper>

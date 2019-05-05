@@ -5,6 +5,14 @@
  */
 package util;
 
+import entidades.Cliente;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * @author adrian
  */
@@ -24,6 +32,9 @@ public class Util {
         desconocido             (-1),
         error                   (3),
         ponerMenu               (30),
+        
+        // 200 - 299. Mensajes de confirmación (Status OK)
+        ok                      (200),
         
         // 400 - 449. Errores del cliente
         forbidden               (403),  // Intentar acceder sin tener privilegios necesarios
@@ -84,26 +95,92 @@ public class Util {
     };
 
     private static final String separator = ";";
+    private static final String separatorArgs = "[:]";
+    private static final ENCRIPTADOR encriptacion = ENCRIPTADOR.plain;
     
     /**
-     * Convierte el texto del servidor a una sola linea
+     * Convierte una cadena de texto en un paquete 
+     * 
+     * TODO: Convertir el paquete en un DTO
      */
-    public static String encode (CODIGO code) {
-        return encriptar(ENCRIPTADOR.plain, code.getCodigo()+"");
+    public static Paquete unpack (String cadena) {
+        String[] decoded = decode(cadena);
+        
+        if (decoded==null || decoded.length<3) {
+            System.err.println("Error Util::unpack: El paquete no se ha formado correctamente.");
+            //throw new Exception();
+            return null;
+        }
+        
+        // Extraemos el contenido del paquete
+        CODIGO cod = CODIGO.fromCode(decoded[0]);
+        String nick = decoded[1];
+        String token = decoded[2];
+        String uri = decoded[3];
+        Map<String,String> parametros = new HashMap<>();
+        if (decoded.length>=4) {
+            for (int i = 4; i < decoded.length; i++) {
+                String[] type = decoded[i].split(separatorArgs);
+                if (type.length<2) {
+                    // NO ES UN ARGUMENTO.
+                    // TODO: devolver correctamente el mensaje de error
+                    System.err.println("La variable " + decoded[i] + " no es un parametro");
+                    continue;
+                }
+                parametros.put(type[0], type[1]);
+            }
+        }
+        
+        // Lo almacenamos en un objeto de tipo Paquete
+        Paquete pack = new Paquete();
+        pack.setCodigo(cod);
+        pack.setNick(nick);
+        pack.setToken(token);
+        pack.setUri(uri);
+        pack.setArgumentos(parametros);
+        
+        // Lo devolvemos
+        return pack;
+    }
+    
+    /**
+     * Convierte un paquete en un String.
+     * 
+     * TODO: Convertir el paquete en un DTO
+     */
+    public static String pack (Paquete paquete) {
+        String parametros = "";
+        for (Map.Entry<String, String> entry : paquete.getArgumentos().entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            
+            parametros += key + ":" + value + ";";
+        }
+        
+        String encoded = encode (paquete.getCodigo(), paquete.getNick(), paquete.getToken(), paquete.getUri(), parametros);
+        
+        return encoded;
     }
     
     /**
      * Convierte el texto del servidor a una sola linea
      */
-    public static String encode (CODIGO code, String... contenido) {
-        return encriptar(ENCRIPTADOR.plain, code.getCodigo()+separator+String.join(separator, contenido));
+    private static String encode (CODIGO code) {
+        return encriptar(encriptacion, code.getCodigo()+"");
+    }
+    
+    /**
+     * Convierte el texto del servidor a una sola linea
+     */
+    private static String encode (CODIGO code, String... contenido) {
+        return encriptar(encriptacion, code.getCodigo()+separator+String.join(separator, contenido));
     }
     
     /**
      * Desencripta el contenido de la cadena en un array de String
      */
-    public static String[] decode (String cadena) {
-        return desencriptar(ENCRIPTADOR.plain,cadena).replace("\0","").split(separator);
+    private static String[] decode (String cadena) {
+        return desencriptar(encriptacion,cadena).replace("\0","").split(separator);
     }
     
     /**
@@ -125,6 +202,44 @@ public class Util {
      */
     private static String desencriptar (ENCRIPTADOR cod, String texto) {
         return texto;
+    }
+    
+    public static Map<String,String> convertObjectToMap (Object obj) {
+        Class clase = Cliente.class;
+        Field[] campos = clase.getDeclaredFields();
+        
+        Map<String,String> parametros = new HashMap<>();
+        
+        for (Field f : campos) {
+            String genericType = f.getGenericType().toString().split(" ")[0];
+            
+            if (!genericType.equals("interface")) {
+                try {
+                    boolean ignore = false;
+                    Annotation[] anotaciones = f.getAnnotations();
+                    for (Annotation a : anotaciones) {
+                        if (a.annotationType().getSimpleName().equals("Ignore")){
+                            ignore=true;
+                            break;
+                        }
+                    }
+                    if (ignore) continue;
+                    
+                    String methodName = f.getName();
+                    methodName = "get" + methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
+                    
+                    Method metodo = clase.getMethod (methodName);
+                    Object o = metodo.invoke(obj);
+                    
+                    parametros.put(f.getName(), o==null?null:o.toString());
+                } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+                    System.err.println("Error en "+ f.getName() + ": "+ex.getMessage() + " ("+ex.getClass().getName()+")");
+                } 
+                
+            }
+        }
+        
+        return parametros;
     }
     
     // Mejoraría cambiar el cifrado

@@ -2,6 +2,7 @@ package entidades;
 // Generated 28-abr-2019 23:19:03 by Hibernate Tools 4.3.1
 
 
+import anotaciones.Ignore;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -18,6 +19,7 @@ public class Cliente  implements java.io.Serializable {
      private String apellido2;
      private String nick;
      private String email;
+     @Ignore
      private String pass;
      private int minutos;
      private byte activada;

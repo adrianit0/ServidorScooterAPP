@@ -5,10 +5,15 @@
  */
 package configuration_server;
 
+import excepciones.MapperException;
+import excepciones.MethodNotExecutedException;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.xml.parsers.ParserConfigurationException;
@@ -22,23 +27,28 @@ import org.xml.sax.helpers.DefaultHandler;
  *
  * @author agarcia.gonzalez
  */
-public class ConfigurationSAX {
+public class ConfigurationSAXMapper {
 
     private static String FICHERO = "config.xml";
 
-    public static void main(String[] args) throws ParserConfigurationException, SAXException, IOException {
+    public ConfigurationMapper createMapper () {
+        ConfigurationMapper configuracion = null;
+        try {
+            SAXParserFactory factory = SAXParserFactory.newInstance();
+            // SAXParser es quien lee el documento XML
+            SAXParser saxParser;
+            saxParser = factory.newSAXParser();
+            
+            ConfigurationHandler handler = new ConfigurationHandler();
+            saxParser.parse(new File("src/" + FICHERO), handler);
 
-        SAXParserFactory factory = SAXParserFactory.newInstance();
-        // SAXParser es quien lee el documento XML
-        SAXParser saxParser = factory.newSAXParser();
-        ConfigurationHandler handler = new ConfigurationHandler();
-        saxParser.parse(new File("src/" + FICHERO), handler);
-
-        // Ya está el manejador funcionando
-        ConfigurationMapper configuracion = handler.getMapper();
-
-        String s = (String) configuracion.getMetodos().get(0).invoke("Hola xd");
-        System.out.println(s);
+            // Ya está el manejador funcionando
+            configuracion = handler.getMapper();
+        } catch (ParserConfigurationException | SAXException | IOException ex) {
+            Logger.getLogger(ConfigurationSAXMapper.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        
+        return configuracion;
     }
 
     // Necesitamos el manejador.
@@ -53,13 +63,14 @@ class ConfigurationHandler extends DefaultHandler {
     private String nombreMethod;
     
     private ArrayList<Class> tempParams;
+    private Map<String, Object> objetosInstanciados;
     
     private StringBuilder buffer;
 
     public ConfigurationHandler() {
         mapper = new ConfigurationMapper();
-        mapper.setMetodos(new ArrayList<ConfigurationMethod>());
         buffer = new StringBuilder();
+        objetosInstanciados = new HashMap<String,Object>();
     }
     
     public Class getParamType (String classType) {
@@ -76,9 +87,14 @@ class ConfigurationHandler extends DefaultHandler {
             case "bool":
             case "boolean":
                 return Boolean.class;
-                
+            case "map":
+            case "parameter":
+            case "parameters":
+                return Map.class;
+            // TODO: Añadir más tipos primitivos
                 
             default:
+                // TODO: Añadir tipos DTO creados mediante mapeo
                 System.err.println(classType + " no es un tipo compatible con la parametrizazion");
                 return null;
         }
@@ -94,6 +110,8 @@ class ConfigurationHandler extends DefaultHandler {
             case "mapping":
                 tempMethod = new ConfigurationMethod();
                 tempMethod.setToken(attributes.getValue("token").toLowerCase().equals("true"));
+                tempMethod.setUri(attributes.getValue("link"));
+                tempMethod.setReturnParam(attributes.getValue("return"));
                 
                 nombreMethod = attributes.getValue("method");
                 
@@ -101,12 +119,18 @@ class ConfigurationHandler extends DefaultHandler {
         
                 try {
                     clase = Class.forName(nombreClase);
-                    Object obj = clase.newInstance();
+                    Object obj;
+                    
+                    // Buscamos si ya fue creado previamente el objeto
+                    if (objetosInstanciados.containsKey(nombreClase)) {
+                        obj = objetosInstanciados.get(nombreClase);
+                    } else {
+                        obj  = clase.newInstance();
+                        objetosInstanciados.put(nombreClase, obj);
+                    }
                     
                     // Añadimos la instancia del método
                     tempMethod.setInstance(obj);
-                    
-                    
                     
                 } catch (ClassNotFoundException ex) {
                     System.err.println("Clase "+nombreClase+" no encontrada: " + ex);
@@ -137,7 +161,7 @@ class ConfigurationHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String qName) throws SAXException {
         switch (qName) {
             case "mapping":
-                mapper.getMetodos().add(tempMethod);
+                mapper.addMethod(tempMethod);
                 break;
             case "params":
                 tempMethod.setParams(tempParams);

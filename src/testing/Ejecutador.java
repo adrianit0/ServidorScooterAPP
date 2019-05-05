@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package configuration_server;
+package testing;
 
 /**
  *
@@ -11,6 +11,10 @@ package configuration_server;
  */
 public class Ejecutador {
     public String Metodo (String texto) {
-        return "Hola mundo " + texto;
+        return "Esto es un método creado reflexivamente: " + texto;
+    }
+    
+    public String test (String t) {
+        return "Esto es un método creado reflexivamente: " +t;
     }
 }

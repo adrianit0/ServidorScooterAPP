@@ -5,6 +5,9 @@
  */
 package configuration_server;
 
+import excepciones.MapperException;
+import excepciones.MethodNotExecutedException;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
 
@@ -48,12 +51,36 @@ public class ConfigurationMapper {
     public void setPort(String port) {
         this.port = port;
     }
-
-    public ArrayList<ConfigurationMethod> getMetodos() {
-        return metodos;
+    
+    public void addMethod (ConfigurationMethod metodo) {
+        if (this.metodos==null) 
+            this.metodos = new ArrayList<ConfigurationMethod>();
+        
+        this.metodos.add(metodo);
     }
+    
+    public ConfigurationMethod getMethod (String uri) {
+        for (ConfigurationMethod m : metodos) {
+            if (m.getUri().equals(uri)) {
+                return m;
+            }
+        }
+        return null;
+    }
+    
+    public Object executeMethod (String uri, Object... params) throws MapperException {
+        try {
+            for (ConfigurationMethod m : metodos) {
+                if (m.getUri().equals(uri)) {
+                    return m.invoke(params);
+                }
+            }
 
-    public void setMetodos(ArrayList<ConfigurationMethod> metodos) {
-        this.metodos = metodos;
+            // No ha encontrado ningún método para ejecutar
+            throw new MethodNotExecutedException ("No se ha podido ejecutar el método "+uri);
+        } catch (MethodNotExecutedException e) {
+            // Centralizamos todos los tipos de excepciones que se podrían generar en una sola excepcion
+            throw new MapperException (e.getMessage(), e);
+        }
     }
 }

@@ -5,6 +5,7 @@
  */
 package configuration_server;
 
+import excepciones.ExecuteError;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -53,8 +54,14 @@ public class ConfigurationMethod {
         // TODO: Comprobar que los parametros dados son los correctos.
         try {
             return metodo.invoke(instance, par);
-        } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+        } catch (IllegalAccessException | IllegalArgumentException  ex) {
             System.err.println("Error de invocación del método: " + ex);
+        } catch (InvocationTargetException e) {
+            if (e.getCause() instanceof ExecuteError) {
+                ExecuteError error = (ExecuteError) e.getCause();
+                
+                return error.getParams();
+            }
         }
         return null;
     }
