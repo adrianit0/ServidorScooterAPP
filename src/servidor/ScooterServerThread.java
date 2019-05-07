@@ -21,9 +21,9 @@ import util.Util.CODIGO;
 public class ScooterServerThread extends Thread {
 
     private Socket socket = null;
-    private ScooterServerUDP servidor;
+    private ScooterServerTCP servidor;
     
-    public ScooterServerThread(Socket socket, ScooterServerUDP servidor) {
+    public ScooterServerThread(Socket socket, ScooterServerTCP servidor) {
 	super("AhorcadoMultiServer");
 	this.socket = socket;
         this.servidor = servidor;

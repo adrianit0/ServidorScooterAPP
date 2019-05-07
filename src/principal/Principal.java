@@ -7,8 +7,10 @@ package principal;
 
 import configuration_server.ConfigurationMapper;
 import configuration_server.ConfigurationSAXMapper;
+import java.io.File;
 import java.io.IOException;
 import java.net.ServerSocket;
+import servidor.ScooterServerTCP;
 import servidor.ScooterServerThread;
 import servidor.ScooterServerUDP;
 
@@ -17,35 +19,7 @@ import servidor.ScooterServerUDP;
  * @author agarcia.gonzalez
  */
 public class Principal {
-    
-    
-    private void execute () throws IOException {
-        
-        // Pruebas para el servidor UDP
-        ScooterServerUDP servidorUDP = new ScooterServerUDP();
-        servidorUDP.start();
-        
-        //Servidor TCP, para las Scooters
-        /*ServerSocket serverSocket = null;
-        boolean listening = true;
-        
-        try {
-            serverSocket = new ServerSocket(servidorUDP.port);
-        } catch (IOException e) {
-            System.err.println("No puedo escuchar el puerto: " + servidorUDP.port);
-            return;
-        }
-        
-        System.out.println("Se inicia el servidor, empieza a buscar clientes.");
-
-        while (listening)
-	    new ScooterServerThread(serverSocket.accept(), servidorUDP).start();
-
-        serverSocket.close();*/
-    }
-    
-    
     public static void main(String[] args) throws IOException  {
-        (new Principal()).execute();
+        (new ScooterServerTCP()).execute();
     }
 }

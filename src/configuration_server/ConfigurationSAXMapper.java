@@ -133,7 +133,31 @@ class ConfigurationHandler extends DefaultHandler {
                     tempMethod.setInstance(obj);
                     
                 } catch (ClassNotFoundException ex) {
-                    System.err.println("Clase "+nombreClase+" no encontrada: " + ex);
+                    try {
+                        String n = nombreClase.replaceAll("[.]", "[/]");
+                        clase = Class.forName(n);
+                        
+                        System.out.println("Nombre: " + n);
+                        Object obj;
+
+                        // Buscamos si ya fue creado previamente el objeto
+                        if (objetosInstanciados.containsKey(nombreClase)) {
+                            obj = objetosInstanciados.get(nombreClase);
+                        } else {
+                            obj  = clase.newInstance();
+                            objetosInstanciados.put(nombreClase, obj);
+                        }
+
+                        // Añadimos la instancia del método
+                        tempMethod.setInstance(obj);
+                    } catch (ClassNotFoundException ex2) {
+                        System.err.println("Clase "+nombreClase+" no encontrada: " + ex);
+                        }catch (InstantiationException ex2) {
+                        System.err.println("Error de instanciación: " + ex2);
+                    } catch (IllegalAccessException ex2) {
+                        System.err.println("Error de acceso: " +ex2);
+                    }
+                    
                 } catch (InstantiationException ex) {
                     System.err.println("Error de instanciación: " + ex);
                 } catch (IllegalAccessException ex) {
@@ -161,9 +185,15 @@ class ConfigurationHandler extends DefaultHandler {
     public void endElement(String uri, String localName, String qName) throws SAXException {
         switch (qName) {
             case "mapping":
+                if (clase==null)
+                    return;
+                
                 mapper.addMethod(tempMethod);
+                System.out.println("Método " + tempMethod.getMetodo().getName() + " del singleton " + clase.getName() + " se ha añadido correctamente a la coleción");
                 break;
             case "params":
+                if (clase==null)
+                    break;
                 tempMethod.setParams(tempParams);
                 Class[] clases = new Class[tempParams.size()];
                 clases = tempParams.toArray(clases);
