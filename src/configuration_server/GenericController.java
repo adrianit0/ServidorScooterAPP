@@ -5,6 +5,8 @@
  */
 package configuration_server;
 
+import util.HibernateManager;
+
 /**
  *
  *  Controlador generico del cual deberá extender el resto de controladores.
@@ -13,4 +15,9 @@ package configuration_server;
  */
 public class GenericController {
     
+    private HibernateManager mh = new HibernateManager();
+
+    public HibernateManager getHManager() {
+        return mh;
+    }
 }

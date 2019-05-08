@@ -10,34 +10,24 @@ import util.Util.CODIGO;
 
 /**
  *
+ * Paquete que le llegar del servidor al cliente con la información del mismo
+ * 
  * @author agarcia.gonzalez
  */
-public class Paquete {
+public class PaqueteCliente {
     private CODIGO codigo;
-    private String nick;
-    private String token;
-    private String uri;
+    private String idPaquete;
     
     private Map<String,String> argumentos;
 
-    public Paquete() { }
+    public PaqueteCliente() { }
 
-    public Paquete(CODIGO codigo, String nick, String token, String uri, Map<String, String> argumentos) {
+    public PaqueteCliente(CODIGO codigo, String idPaquete, Map<String, String> argumentos) {
         this.codigo = codigo;
-        this.nick = nick;
-        this.token = token;
-        this.uri = uri;
+        this.idPaquete = idPaquete;
         this.argumentos = argumentos;
     }
 
-    public String getUri() {
-        return uri;
-    }
-
-    public void setUri(String uri) {
-        this.uri = uri;
-    }
-    
     public CODIGO getCodigo() {
         return codigo;
     }
@@ -46,20 +36,12 @@ public class Paquete {
         this.codigo = codigo;
     }
 
-    public String getNick() {
-        return nick;
+    public String getIdPaquete() {
+        return idPaquete;
     }
 
-    public void setNick(String nick) {
-        this.nick = nick;
-    }
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
+    public void setIdPaquete(String idPaquete) {
+        this.idPaquete = idPaquete;
     }
 
     public Map<String, String> getArgumentos() {
@@ -69,6 +51,7 @@ public class Paquete {
     public void setArgumentos(Map<String, String> argumentos) {
         this.argumentos = argumentos;
     }
+
     
     
     

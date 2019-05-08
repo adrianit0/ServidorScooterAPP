@@ -29,8 +29,21 @@ import util.HibernateUtil;
  * @author agarcia.gonzalez
  */
 public class Main {
-    public static void main(String[] args) throws MapperException  {
+    public static void main(String[] args)  {
         
+        String texto = "hola;Esto es un:texto con|carac&asperteres especiales & |";
+        
+        String converted = texto.replaceAll("[&]", "&a").replaceAll("[|]", "&p").replaceAll("[;]", "&c").replaceAll("[:]", "&d");
+        
+        String reconverted = converted.replaceAll("&a", "&").replaceAll("&p", "|").replaceAll("&c", ";").replaceAll("&d", ":");
+        
+        
+        System.out.println(reconverted);
+        System.out.println((texto.equals(reconverted)?"Son iguales":"No son iguales"));
+        
+    }
+    
+    private void ejecutarMetodo () throws MapperException {
         ConfigurationSAXMapper saxFactory = new ConfigurationSAXMapper();
         
         ConfigurationMapper mapper = saxFactory.createMapper();
@@ -44,8 +57,6 @@ public class Main {
         String texto = (String) mapper.executeMethod("test", "Hoola");
         
         System.out.println("Ejecutado: " + texto);
-        
-        
     }
     
     private void addObjectToAMap() {

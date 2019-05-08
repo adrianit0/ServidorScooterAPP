@@ -8,34 +8,21 @@ package controller;
 import configuration_server.GenericController;
 import entidades.Cliente;
 import excepciones.ExecuteError;
-import excepciones.MapperException;
 import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
-import util.HibernateManager;
 import util.Util;
 
 /**
  *
- * Clase donde estará mapeado las clases de sesión
- * 
  * @author agarcia.gonzalez
  */
-public class UsuarioController extends GenericController implements IUsuarioController {
+public class EmpleadoController extends GenericController {
     
-    
-    @Override
-    public Map<String, String> login(Map<String, String> parameters) throws ExecuteError {
-        String nick = parameters.get("nick");
-        String pass = parameters.get("pass");
+    public Map<String, String> getEmpleados() throws ExecuteError {
         
         // Añadimos los criterios para que Hibernate haga la búsqueda
-        Map<String,String> criterios = new HashMap<>();
-        criterios.put("nick", nick);
-        criterios.put("pass", pass);
-        
-        Cliente cliente = (Cliente) this.getHManager().getObjectCriterio("Cliente", criterios);
+        /*
+        Cliente cliente = (Cliente) this.getHManager();
         
         if (cliente==null) {
             throw new ExecuteError ("Nombre o contraseña erronea", null);
@@ -47,11 +34,9 @@ public class UsuarioController extends GenericController implements IUsuarioCont
         String token = Util.crearTokenUsuario();
         result.put("token", token);
         
-        return result;
-    }
-
-    @Override
-    public Map<String, String> register(Map<String, String> parameters) {
+        return result;*/
+        
         return null;
     }
+    
 }

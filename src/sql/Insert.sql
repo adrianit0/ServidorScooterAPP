@@ -37,3 +37,14 @@ INSERT INTO EstadoTarea (nombre, descripcion) VALUES
     ('Finalizado', 'Ha sido finalizado sin problemas'),
     ('No finalizado', 'No ha completado la tarea'),
     ('Cancelada', 'La tarea ha sido cancelada por parte de la administración a un empleado. No suma al computo total diario');
+
+-- PRIMEROS VALORES PARA POBLAR LA BASE DE DATOS
+INSERT INTO ciudad (nombre, provincia) VALUES
+    ('Cádiz', 'Cádiz'), ('Jerez de la Frontera', 'Cádiz'), ('San Fernando', 'Cádiz'), ('Sevilla', 'Sevilla');
+
+INSERT INTO sede (nombre, direccion, ciudad_id) VALUES
+    ('ScooterAPP principal', 'Calle Sacramento', (SELECT id FROM ciudad WHERE nombre='Cádiz' LIMIT 1)),
+    ('ScooterAPP filial', 'Calle Investigación', (SELECT id FROM ciudad WHERE nombre LIKE '%Jerez%' LIMIT 1));
+
+INSERT INTO empleado (nombre, apellido1, apellido2, dni, direccion, email, pass, sueldo, puesto_id, ciudad_id, sede_id) VALUES
+    ('Administrador', 'Admin', null, '12345678A', 'Foo Street', 'admin', '1234', 0, 1, 1, 1);

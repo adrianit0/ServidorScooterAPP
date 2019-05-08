@@ -29,8 +29,8 @@
             <!-- Quien puede acceder al contenido, si la lista está vacía podrá acceder todos, en caso contrario solo los que esten incluidos dentro -->
             <!-- La white list permite filtrar tanto por rol como por estado -->
             <white-list>
-               <role name="user" />
-               <role name="admin" />
+               <role name="cliente" />
+               <role name="administrador" />
                
                <state name="reservando" />
                <state name="alquilando" />
@@ -54,6 +54,13 @@
             <params>
                 <param type="parameters" />
             </params>
+        </mapping>
+        
+        <mapping link="getEmpleados" className="controller.EmpleadoController" method="getEmpleados" return="map" token="true">
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
         </mapping>
     </mappers>
 </configuration-mapper>

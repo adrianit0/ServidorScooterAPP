@@ -5,7 +5,6 @@
  */
 package util;
 
-import entidades.Cliente;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
@@ -103,7 +102,7 @@ public class Util {
      * 
      * TODO: Convertir el paquete en un DTO
      */
-    public static Paquete unpack (String cadena) {
+    public static PaqueteServidor unpackToServer (String cadena) {
         String[] decoded = decode(cadena);
         
         if (decoded==null || decoded.length<3) {
@@ -113,7 +112,7 @@ public class Util {
         }
         
         // Extraemos el contenido del paquete
-        CODIGO cod = CODIGO.fromCode(decoded[0]);
+        String idPaquete = decoded[0];
         String nick = decoded[1];
         String token = decoded[2];
         String uri = decoded[3];
@@ -132,8 +131,8 @@ public class Util {
         }
         
         // Lo almacenamos en un objeto de tipo Paquete
-        Paquete pack = new Paquete();
-        pack.setCodigo(cod);
+        PaqueteServidor pack = new PaqueteServidor();
+        pack.setIdPaquete(idPaquete);
         pack.setNick(nick);
         pack.setToken(token);
         pack.setUri(uri);
@@ -148,7 +147,7 @@ public class Util {
      * 
      * TODO: Convertir el paquete en un DTO
      */
-    public static String pack (Paquete paquete) {
+    public static String packFromServer (PaqueteServidor paquete) {
         String parametros = "";
         for (Map.Entry<String, String> entry : paquete.getArgumentos().entrySet()) {
             String key = entry.getKey();
@@ -157,7 +156,67 @@ public class Util {
             parametros += key + ":" + value + ";";
         }
         
-        String encoded = encode (paquete.getCodigo(), paquete.getNick(), paquete.getToken(), paquete.getUri(), parametros);
+        String encoded = encode (paquete.getIdPaquete(), paquete.getNick(), paquete.getToken(), paquete.getUri(), parametros);
+        
+        return encoded;
+    }
+    
+    /**
+     * Convierte una cadena de texto en un paquete 
+     * 
+     * TODO: Convertir el paquete en un DTO
+     */
+    public static PaqueteCliente unpackToCliente (String cadena) {
+        String[] decoded = decode(cadena);
+        
+        if (decoded==null || decoded.length<3) {
+            System.err.println("Error Util::unpack: El paquete no se ha formado correctamente.");
+            //throw new Exception();
+            return null;
+        }
+        
+        // Extraemos el contenido del paquete
+        CODIGO codigo = CODIGO.fromCode(decoded[0]);
+        String idPaquete = decoded[1];
+        Map<String,String> parametros = new HashMap<>();
+        if (decoded.length>2) {
+            for (int i = 2; i < decoded.length; i++) {
+                String[] type = decoded[i].split(separatorArgs);
+                if (type.length<2) {
+                    // NO ES UN ARGUMENTO.
+                    // TODO: devolver correctamente el mensaje de error
+                    System.err.println("La variable " + decoded[i] + " no es un parametro");
+                    continue;
+                }
+                parametros.put(type[0], type[1]);
+            }
+        }
+        
+        // Lo almacenamos en un objeto de tipo Paquete
+        PaqueteCliente pack = new PaqueteCliente();
+        pack.setCodigo(codigo);
+        pack.setIdPaquete(idPaquete);
+        pack.setArgumentos(parametros);
+        
+        // Lo devolvemos
+        return pack;
+    }
+    
+    /**
+     * Convierte un paquete en un String.
+     * 
+     * TODO: Convertir el paquete en un DTO
+     */
+    public static String packFromClient (PaqueteCliente paquete) {
+        String parametros = "";
+        for (Map.Entry<String, String> entry : paquete.getArgumentos().entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            
+            parametros += key + ":" + value + ";";
+        }
+        
+        String encoded = encode (paquete.getCodigo(), paquete.getIdPaquete(), parametros);
         
         return encoded;
     }
@@ -173,14 +232,36 @@ public class Util {
      * Convierte el texto del servidor a una sola linea
      */
     private static String encode (CODIGO code, String... contenido) {
-        return encriptar(encriptacion, code.getCodigo()+separator+String.join(separator, contenido));
+        return encriptar(encriptacion, code.getCodigo()+separator+String.join(separator, transformar(contenido)));
+    }
+    
+    private static String encode (String... contenido) {
+        return encriptar(encriptacion, String.join(separator, transformar(contenido)));
     }
     
     /**
      * Desencripta el contenido de la cadena en un array de String
      */
     private static String[] decode (String cadena) {
-        return desencriptar(encriptacion,cadena).replace("\0","").split(separator);
+        return destransformar(desencriptar(encriptacion,cadena).replace("\0","").split(separator));
+    }
+    
+    // Es probable que dentro del texto contenga información que pueda corromperse
+    // debido a la estructura interna de la trama de datos, por eso lo vamos a sustituir
+    // usando un sistema de entidades parecidas a la que utiliza HTML
+    private static String[] transformar (String[] textos) {
+        for (int i = 0; i < textos.length; i++)
+            textos[i]=textos[i].replaceAll("[&]", "&a").replaceAll("[|]", "&p").replaceAll("["+separator+"]", "&c").replaceAll("["+separatorArgs+"]", "&d");
+        
+        return textos;
+    }
+    
+    // Vuelve a convertir de las entidades al que habia antes
+    private static String[] destransformar (String[] textos) {
+        for (int i = 0; i < textos.length; i++) 
+            textos[i] = textos[i].replaceAll("&a", "&").replaceAll("&p", "|").replaceAll("&c", separator).replaceAll("&d", separatorArgs);
+        
+        return textos;
     }
     
     /**
@@ -205,7 +286,7 @@ public class Util {
     }
     
     public static Map<String,String> convertObjectToMap (Object obj) {
-        Class clase = Cliente.class;
+        Class clase = obj.getClass();;
         Field[] campos = clase.getDeclaredFields();
         
         Map<String,String> parametros = new HashMap<>();
