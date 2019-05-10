@@ -34,7 +34,7 @@ public class ScooterServerThread extends Thread {
     private boolean listening;
     
     public ScooterServerThread(Socket socket, ScooterServerTCP servidor) {
-	super("AhorcadoMultiServer");
+	super("ScooterAPP server");
 	this.socket = socket;
         this.servidor = servidor;
         

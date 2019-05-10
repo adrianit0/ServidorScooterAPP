@@ -16,7 +16,6 @@ import java.util.Map;
  * @author adrian
  */
 public class Util {
-    
     /**
      * Convierte codigos dificiles de enviar por letras distinguibles.
      * 
@@ -38,7 +37,10 @@ public class Util {
         // 400 - 449. Errores del cliente
         forbidden               (403),  // Intentar acceder sin tener privilegios necesarios
         notFound                (404),
+        timeOut                 (408),
         sessionExpired          (440),
+        notConnection           (450),
+        
         
         // 450 - 499. Errores del servidor
         internalError           (450),
@@ -47,6 +49,7 @@ public class Util {
         identificarse           (500),
         conectado               (501),
         loginFailed             (502),
+        
         
         registrarse             (550),
         registrado              (551),
@@ -94,7 +97,7 @@ public class Util {
     };
 
     private static final String separator = ";";
-    private static final String separatorArgs = "[:]";
+    private static final String separatorArgs = ":";
     private static final ENCRIPTADOR encriptacion = ENCRIPTADOR.plain;
     
     /**
@@ -119,7 +122,7 @@ public class Util {
         Map<String,String> parametros = new HashMap<>();
         if (decoded.length>=4) {
             for (int i = 4; i < decoded.length; i++) {
-                String[] type = decoded[i].split(separatorArgs);
+                String[] type = decoded[i].split("["+separatorArgs+"]");
                 if (type.length<2) {
                     // NO ES UN ARGUMENTO.
                     // TODO: devolver correctamente el mensaje de error
@@ -148,15 +151,23 @@ public class Util {
      * TODO: Convertir el paquete en un DTO
      */
     public static String packFromServer (PaqueteServidor paquete) {
-        String parametros = "";
+        int total = paquete.getArgumentos().size();
+        String[] parametros = new String[total+4];
+        parametros[0] = paquete.getIdPaquete();
+        parametros[1] = paquete.getNick();
+        parametros[2] = paquete.getToken();
+        parametros[3] = paquete.getUri();
+        int actual = 4;
         for (Map.Entry<String, String> entry : paquete.getArgumentos().entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
             
-            parametros += key + ":" + value + ";";
+            parametros[actual] = key + ":" + value;
+            
+            actual++;
         }
         
-        String encoded = encode (paquete.getIdPaquete(), paquete.getNick(), paquete.getToken(), paquete.getUri(), parametros);
+        String encoded = encode (parametros);
         
         return encoded;
     }
@@ -181,7 +192,7 @@ public class Util {
         Map<String,String> parametros = new HashMap<>();
         if (decoded.length>2) {
             for (int i = 2; i < decoded.length; i++) {
-                String[] type = decoded[i].split(separatorArgs);
+                String[] type = decoded[i].split("["+separatorArgs+"]");
                 if (type.length<2) {
                     // NO ES UN ARGUMENTO.
                     // TODO: devolver correctamente el mensaje de error
@@ -208,15 +219,21 @@ public class Util {
      * TODO: Convertir el paquete en un DTO
      */
     public static String packFromClient (PaqueteCliente paquete) {
-        String parametros = "";
+        int total = paquete.getArgumentos().size();
+        String[] parametros = new String[total+1];
+        parametros[0] = paquete.getIdPaquete();
+        int actual = 1;
         for (Map.Entry<String, String> entry : paquete.getArgumentos().entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
             
-            parametros += key + ":" + value + ";";
+            parametros[actual] = key + ":" + value;
+            
+            actual++;
+            
         }
         
-        String encoded = encode (paquete.getCodigo(), paquete.getIdPaquete(), parametros);
+        String encoded = encode (paquete.getCodigo(), parametros);
         
         return encoded;
     }
@@ -251,7 +268,8 @@ public class Util {
     // usando un sistema de entidades parecidas a la que utiliza HTML
     private static String[] transformar (String[] textos) {
         for (int i = 0; i < textos.length; i++)
-            textos[i]=textos[i].replaceAll("[&]", "&a").replaceAll("[|]", "&p").replaceAll("["+separator+"]", "&c").replaceAll("["+separatorArgs+"]", "&d");
+            if (textos[i]!=null)
+                textos[i]=textos[i].replaceAll("[&]", "&a").replaceAll("[|]", "&p").replaceAll("["+separator+"]", "&c").replaceAll("["+separatorArgs+"]", "&d");
         
         return textos;
     }
@@ -286,7 +304,7 @@ public class Util {
     }
     
     public static Map<String,String> convertObjectToMap (Object obj) {
-        Class clase = obj.getClass();;
+        Class clase = obj.getClass();
         Field[] campos = clase.getDeclaredFields();
         
         Map<String,String> parametros = new HashMap<>();

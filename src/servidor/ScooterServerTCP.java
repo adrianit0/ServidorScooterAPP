@@ -57,15 +57,6 @@ public class ScooterServerTCP extends Thread{
         serverSocket = null;
         listening = true;
         
-        System.out.println("Servidor inicializandose");
-        
-        try {
-            serverSocket = new ServerSocket(port);
-        } catch (IOException e) {
-            System.err.println("No puedo escuchar el puerto: " + port);
-            return;
-        }
-        
         System.out.println("Inicializando mapeadores de clases y métodos");
         ConfigurationSAXMapper saxFactory = new ConfigurationSAXMapper();
         mapper = saxFactory.createMapper();
@@ -134,10 +125,12 @@ public class ScooterServerTCP extends Thread{
     private void opnServerSocket() {
         try {
             this.serverSocket = new ServerSocket(port);
+            this.listening = true;
         } catch (IOException e) {
+            this.listening = false;
             throw new RuntimeException("No se puede abrir el puerto "+port, e);
         }
-        this.listening = true;
+        
     }
     
     public synchronized boolean puedeRealizarAccion(String token, String usuario) {
@@ -259,6 +252,6 @@ public class ScooterServerTCP extends Thread{
     }
     
     public static void main(String[] args) {
-        (new ScooterServerTCP(678)).start();
+        (new ScooterServerTCP(4444)).start();
     }
 }
