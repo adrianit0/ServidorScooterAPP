@@ -108,6 +108,7 @@ class ConfigurationHandler extends DefaultHandler {
             case "mappers":
                 break;
             case "mapping":
+                tempParams = new ArrayList<Class>();
                 tempMethod = new ConfigurationMethod();
                 tempMethod.setToken(attributes.getValue("token").toLowerCase().equals("true"));
                 tempMethod.setUri(attributes.getValue("link"));
@@ -165,7 +166,7 @@ class ConfigurationHandler extends DefaultHandler {
                 }
                 break;
             case "params":
-                tempParams = new ArrayList<Class>();
+                
                 break;
             case "param":
                 Class clase = getParamType (attributes.getValue("type"));
@@ -188,6 +189,16 @@ class ConfigurationHandler extends DefaultHandler {
                 if (clase==null)
                     return;
                 
+                try {
+                    Class[] clases = new Class[tempParams.size()];
+                    clases = tempParams.toArray(clases);
+                    Method metodo = clase.getMethod(nombreMethod, clases);
+                    tempMethod.setMetodo(metodo);
+                } catch (NoSuchMethodException | SecurityException ex) {
+                    System.err.println("Error de creación del método: " + ex);
+                }
+                
+                System.out.println("Metodos: " + tempMethod.getMetodo());
                 mapper.addMethod(tempMethod);
                 System.out.println("Método " + tempMethod.getMetodo().getName() + " del singleton " + clase.getName() + " se ha añadido correctamente a la coleción");
                 break;
@@ -195,15 +206,6 @@ class ConfigurationHandler extends DefaultHandler {
                 if (clase==null)
                     break;
                 tempMethod.setParams(tempParams);
-                Class[] clases = new Class[tempParams.size()];
-                clases = tempParams.toArray(clases);
-                
-                try {
-                    Method metodo = clase.getMethod(nombreMethod, clases);
-                    tempMethod.setMetodo(metodo);
-                } catch (NoSuchMethodException | SecurityException ex) {
-                    System.err.println("Error de creación del método: " + ex);
-                }
                 break;
             case "url":
                 mapper.setUrl(buffer.toString());

@@ -36,14 +36,23 @@ public class ScooterServerTCP extends Thread{
     // Constantes
     private final double outTime = 300000; // Tiempo por el que se dará por finalizada la sesión. 5 minutos
     
+    private static ScooterServerTCP instance;
     
     public ScooterServerTCP (int port) {
         this.port = port;
         
         usuariosConectados = new LinkedHashMap<>(32);
+        
+        if (instance==null)
+            instance=this;
     }
     
-    public void execute () throws IOException {
+    @Override 
+    public void run () {
+        exec();
+    }
+    
+    private void exec () {
         //Servidor TCP, para las Scooters y los clientes
         serverSocket = null;
         listening = true;
@@ -98,7 +107,7 @@ public class ScooterServerTCP extends Thread{
         }
         System.out.println("Server has Stopped...Please check") ;
         
-        serverSocket.close();
+        stopServer ();
     }
     
     public synchronized ConfigurationMethod getMethod (String uri) {
@@ -247,5 +256,9 @@ public class ScooterServerTCP extends Thread{
     // Obtiene un cliente a partir de su socket
     protected synchronized ClienteInfo getClient(String token) {
         return usuariosConectados.get(token);
+    }
+    
+    public static void main(String[] args) {
+        (new ScooterServerTCP(678)).start();
     }
 }
