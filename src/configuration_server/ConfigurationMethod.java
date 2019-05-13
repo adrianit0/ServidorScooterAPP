@@ -9,6 +9,7 @@ import excepciones.ExecuteError;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -46,9 +47,15 @@ public class ConfigurationMethod {
     }
     
     public Object invoke (Object... par) {
-        if (par.length!=params.size()) {
-            System.err.println("Los parametros dados no son los mismos");
-            return null;
+        int size = (params==null)?0:params.size();
+        
+        if (par.length!=size) {
+            if (!(par.length==1 && par[0] instanceof Map)) {
+                System.err.println("Los parametros dados no son los mismos");
+                return null;
+            } else {
+                par = new Object[0];
+            }
         }
         
         // TODO: Comprobar que los parametros dados son los correctos.

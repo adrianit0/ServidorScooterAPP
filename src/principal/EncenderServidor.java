@@ -18,7 +18,7 @@ import servidor.ScooterServerUDP;
  *
  * @author agarcia.gonzalez
  */
-public class Principal {
+public class EncenderServidor {
     public static void main(String[] args) throws IOException  {
         (new ScooterServerTCP(4444)).start();
     }

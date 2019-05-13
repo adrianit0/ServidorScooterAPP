@@ -115,11 +115,17 @@ public class ScooterServerThread extends Thread {
         }
         
         PaqueteCliente packCliente = new PaqueteCliente();
+        packCliente.setIdPaquete(packServer.getIdPaquete());
         
         // Hacer que el return sea especifico. No como ahora que siempre devolverá un Map<String,String>
         if (!errores) {
             Map<String, String> result = (Map<String, String>) metodo.invoke(packServer.getArgumentos());
 
+            if (result==null) {
+                result=new HashMap<>();
+                result.put("error", "No se ha podido ejecutar el método");
+            }
+            
             // Guarda los nuevos argumentos devueltos
             packCliente.setArgumentos(result);
             if (result.containsKey("error")) {

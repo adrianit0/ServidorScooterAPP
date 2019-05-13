@@ -5,17 +5,14 @@
  */
 package controller;
 
-import excepciones.ExecuteError;
 import java.util.Map;
 
 /**
  *
  * @author agarcia.gonzalez
  */
-public interface IUsuarioController {
-    
-    
-    public Map<String,String> login (Map<String, String> parameters) throws ExecuteError;
-    
-    public Map<String, String> register (Map<String, String> parameters) throws ExecuteError;
+public class TestController {
+    public Map<String, String> echo(Map<String, String> parameters) {
+        return parameters;
+    }
 }

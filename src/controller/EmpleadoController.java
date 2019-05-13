@@ -9,6 +9,7 @@ import configuration_server.GenericController;
 import entidades.Cliente;
 import excepciones.ExecuteError;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import util.Util;
 
@@ -20,23 +21,21 @@ public class EmpleadoController extends GenericController {
     
     public Map<String, String> getEmpleados() throws ExecuteError {
         
-        // Añadimos los criterios para que Hibernate haga la búsqueda
-        /*
-        Cliente cliente = (Cliente) this.getHManager();
         
-        if (cliente==null) {
-            throw new ExecuteError ("Nombre o contraseña erronea", null);
+        List<Cliente> clientes = this.getHManager().getObjects("Cliente");
+        
+        if (clientes==null) {
+            throw new ExecuteError ("No se ha encontrado un cliente", null);
         }
         
-        Map<String, String> result = Util.convertObjectToMap(cliente);
+        Map<String, String> result = new HashMap<>();
+        result.put("length", clientes.size()+"");
+        for (int i = 0; i < clientes.size(); i++) {
+             result.putAll(Util.convertObjectToMap(clientes.get(i), "["+i+"]"));
+        }
         
-        // Generamos, almacenamos y enviamos el token. Tiene que ser aleatoria.
-        String token = Util.crearTokenUsuario();
-        result.put("token", token);
+        return result;
         
-        return result;*/
-        
-        return null;
     }
     
 }

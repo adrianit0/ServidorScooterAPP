@@ -11,6 +11,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 /**
  * @author adrian
@@ -106,6 +107,9 @@ public class Util {
      * TODO: Convertir el paquete en un DTO
      */
     public static PaqueteServidor unpackToServer (String cadena) {
+        PaqueteServidor pack = new PaqueteServidor();
+        cadena = convertirObjetos(cadena, pack);
+        System.out.println("-> " + cadena);
         String[] decoded = decode(cadena);
         
         if (decoded==null || decoded.length<3) {
@@ -129,12 +133,18 @@ public class Util {
                     System.err.println("La variable " + decoded[i] + " no es un parametro");
                     continue;
                 }
-                parametros.put(type[0], type[1]);
+                
+                // Es un objeto ??
+                if (type[1].charAt(0)=='{' && type[1].charAt(type[1].length()-1)=='}') {
+                    
+                }
+                
+                parametros.put(destransformarKeyValue(type[0]), destransformarKeyValue(type[1]));
             }
         }
         
         // Lo almacenamos en un objeto de tipo Paquete
-        PaqueteServidor pack = new PaqueteServidor();
+        
         pack.setIdPaquete(idPaquete);
         pack.setNick(nick);
         pack.setToken(token);
@@ -158,16 +168,27 @@ public class Util {
         parametros[2] = paquete.getToken();
         parametros[3] = paquete.getUri();
         int actual = 4;
+        
+        
+        
         for (Map.Entry<String, String> entry : paquete.getArgumentos().entrySet()) {
             String key = entry.getKey();
             String value = entry.getValue();
             
-            parametros[actual] = key + ":" + value;
+            parametros[actual] = transformarKeyValue(key) + ":" + transformarKeyValue(value);
             
             actual++;
         }
         
         String encoded = encode (parametros);
+        
+        for (Map.Entry<String, String> entry : paquete.getObjetos().entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            
+            
+            encoded = encoded.replace (key, value);
+        }
         
         return encoded;
     }
@@ -178,6 +199,8 @@ public class Util {
      * TODO: Convertir el paquete en un DTO
      */
     public static PaqueteCliente unpackToCliente (String cadena) {
+        PaqueteCliente pack = new PaqueteCliente();
+        cadena = convertirObjetos(cadena, pack);
         String[] decoded = decode(cadena);
         
         if (decoded==null || decoded.length<3) {
@@ -199,12 +222,11 @@ public class Util {
                     System.err.println("La variable " + decoded[i] + " no es un parametro");
                     continue;
                 }
-                parametros.put(type[0], type[1]);
+                parametros.put(destransformarKeyValue(type[0]), destransformarKeyValue(type[1]));
             }
         }
         
         // Lo almacenamos en un objeto de tipo Paquete
-        PaqueteCliente pack = new PaqueteCliente();
         pack.setCodigo(codigo);
         pack.setIdPaquete(idPaquete);
         pack.setArgumentos(parametros);
@@ -227,15 +249,65 @@ public class Util {
             String key = entry.getKey();
             String value = entry.getValue();
             
-            parametros[actual] = key + ":" + value;
+            parametros[actual] = transformarKeyValue(key) + ":" + transformarKeyValue(value);
             
             actual++;
             
         }
         
         String encoded = encode (paquete.getCodigo(), parametros);
+        System.out.println("Cantidad argumentos: " + paquete.getObjetos().size());
+        
+        for (Map.Entry<String, String> entry : paquete.getObjetos().entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            
+            System.out.println("KEY: " + key+ " VALUE:" + value);
+            
+            encoded = encoded.replace (key, value);
+        }
         
         return encoded;
+    }
+    
+    /**
+     *  Convierte los objetos de una trama de datos
+    */
+    private static String convertirObjetos (String trama, IPaquete contenido) {
+        int firstPos = -1;
+        int lastPos = -1;
+        int founds = 0;
+        for (int i = 0; i < trama.length(); i++) {
+            char c = trama.charAt(i);
+            if (c=='{') {
+                if (founds==0) {
+                    firstPos=i;
+                    
+                }
+                founds++;
+                
+            } else if (founds>0 && c=='}') {
+                founds--;
+                if (founds==0) {
+                    lastPos=i;
+                    
+                    String replace = trama.substring(firstPos+1, lastPos);
+                    String toReplace = contenido.addObjeto(
+                            // Convierte el objeto antes de enviarlo
+                            convertirObjetos(replace, contenido)
+                    );
+                    
+                    trama = trama.replaceFirst(Pattern.quote(replace), toReplace);
+                    
+                    i=firstPos+1;
+                    
+                    firstPos=-1;
+                    lastPos=-1;
+                }
+            }
+        }
+        
+        return trama;
     }
     
     /**
@@ -249,37 +321,30 @@ public class Util {
      * Convierte el texto del servidor a una sola linea
      */
     private static String encode (CODIGO code, String... contenido) {
-        return encriptar(encriptacion, code.getCodigo()+separator+String.join(separator, transformar(contenido)));
+        return encriptar(encriptacion, code.getCodigo()+separator+String.join(separator, contenido));
     }
     
     private static String encode (String... contenido) {
-        return encriptar(encriptacion, String.join(separator, transformar(contenido)));
+        return encriptar(encriptacion, String.join(separator, contenido));
     }
     
     /**
      * Desencripta el contenido de la cadena en un array de String
      */
     private static String[] decode (String cadena) {
-        return destransformar(desencriptar(encriptacion,cadena).replace("\0","").split(separator));
+        return desencriptar(encriptacion,cadena).replace("\0","").split(separator);
     }
     
     // Es probable que dentro del texto contenga información que pueda corromperse
     // debido a la estructura interna de la trama de datos, por eso lo vamos a sustituir
     // usando un sistema de entidades parecidas a la que utiliza HTML
-    private static String[] transformar (String[] textos) {
-        for (int i = 0; i < textos.length; i++)
-            if (textos[i]!=null)
-                textos[i]=textos[i].replaceAll("[&]", "&a").replaceAll("[|]", "&p").replaceAll("["+separator+"]", "&c").replaceAll("["+separatorArgs+"]", "&d");
-        
-        return textos;
+    private static String transformarKeyValue (String texto) {
+        return texto.replaceAll("[&]", "&a").replaceAll("["+separatorArgs+"]", "&d")/*.replaceAll("[{]", "&i").replaceAll("[}]", "&f")*/.replaceAll("[|]", "&p").replaceAll("["+separator+"]", "&c");
     }
     
     // Vuelve a convertir de las entidades al que habia antes
-    private static String[] destransformar (String[] textos) {
-        for (int i = 0; i < textos.length; i++) 
-            textos[i] = textos[i].replaceAll("&a", "&").replaceAll("&p", "|").replaceAll("&c", separator).replaceAll("&d", separatorArgs);
-        
-        return textos;
+    private static String destransformarKeyValue (String texto) {
+        return texto.replaceAll("&c", separator).replaceAll("&p", "|")/*.replaceAll("&f", "}").replaceAll("&i", "{")*/.replaceAll("&d", separatorArgs).replaceAll("[&]", "&a");
     }
     
     /**
@@ -303,7 +368,16 @@ public class Util {
         return texto;
     }
     
+    /**
+     * Convierte los valores de un objeto en un Map<String,String>.
+     * 
+     * Ignora cualquier campo que tenga la anotación @Ignore
+     */
     public static Map<String,String> convertObjectToMap (Object obj) {
+        return convertObjectToMap(obj,"");
+    }
+    
+    public static Map<String,String> convertObjectToMap (Object obj, String extra) {
         Class clase = obj.getClass();
         Field[] campos = clase.getDeclaredFields();
         
@@ -330,11 +404,10 @@ public class Util {
                     Method metodo = clase.getMethod (methodName);
                     Object o = metodo.invoke(obj);
                     
-                    parametros.put(f.getName(), o==null?null:o.toString());
+                    parametros.put(f.getName()+extra, o==null?null:o.toString());
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                     System.err.println("Error en "+ f.getName() + ": "+ex.getMessage() + " ("+ex.getClass().getName()+")");
-                } 
-                
+                }
             }
         }
         

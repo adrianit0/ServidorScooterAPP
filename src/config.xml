@@ -55,8 +55,19 @@
                 <param type="parameters" />
             </params>
         </mapping>
+        <mapping link="register" className="controller.UsuarioController" method="register" return="map" token="false">
+            <params>
+                <param type="parameters" />
+            </params>
+        </mapping>
         
-        <mapping link="getEmpleados" className="controller.EmpleadoController" method="getEmpleados" return="map" token="true">
+        <mapping link="echo" className="controller.TestController" method="echo" return="map" token="false">
+            <params>
+                <param type="parameters" />
+            </params>
+        </mapping>
+        
+        <mapping link="getEmpleados" className="controller.EmpleadoController" method="getEmpleados" return="map" token="false">
             <white-list>
                 <role name="administrador" />
                 <role name="directivo" />

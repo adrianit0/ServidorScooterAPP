@@ -77,7 +77,7 @@ public class ConfigurationMapper {
             }
 
             // No ha encontrado ningún método para ejecutar
-            throw new MethodNotExecutedException ("No se ha podido ejecutar el método "+uri);
+            throw new MethodNotExecutedException ("No se ha podido ejecutar el método "+uri+", no se encuentra en el mapper");
         } catch (MethodNotExecutedException e) {
             // Centralizamos todos los tipos de excepciones que se podrían generar en una sola excepcion
             throw new MapperException (e.getMessage(), e);

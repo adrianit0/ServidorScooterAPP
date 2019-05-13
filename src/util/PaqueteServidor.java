@@ -6,6 +6,7 @@
 package util;
 
 import java.util.Map;
+import java.util.TreeMap;
 import util.Util.CODIGO;
 
 /**
@@ -14,15 +15,18 @@ import util.Util.CODIGO;
  * 
  * @author agarcia.gonzalez
  */
-public class PaqueteServidor {
+public class PaqueteServidor implements IPaquete {
     private String idPaquete;
     private String nick;
     private String token;
     private String uri;
     
     private Map<String,String> argumentos;
+    private Map<String,String> objetos;
 
-    public PaqueteServidor() { }
+    public PaqueteServidor() {
+        this.objetos = new TreeMap<>();
+    }
 
     public PaqueteServidor(String idPaquete, String nick, String token, String uri, Map<String, String> argumentos) {
         this.idPaquete = idPaquete;
@@ -30,6 +34,30 @@ public class PaqueteServidor {
         this.token = token;
         this.uri = uri;
         this.argumentos = argumentos;
+        this.objetos = new TreeMap<>();
+    }
+    
+    public String addObjeto (String objeto) {
+        String nombre = "Objeto"+idPaquete+"#"+objetos.size();
+        objetos.put(nombre, objeto);
+        return nombre;
+    }
+
+    public Map<String, String> getObjetos() {
+        return objetos;
+    }
+
+    public void setObjetos(Map<String, String> objetos) {
+        this.objetos = objetos;
+    }
+    
+    
+    
+    public String getObjeto (String key) {
+        if (objetos.containsKey(key))
+            return objetos.get(key);
+        
+        return "null";
     }
 
     public String getIdPaquete() {
