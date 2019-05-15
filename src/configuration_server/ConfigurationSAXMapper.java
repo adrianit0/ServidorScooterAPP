@@ -22,6 +22,7 @@ import javax.xml.parsers.SAXParserFactory;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import servidor.ScooterServerTCP;
 
 /**
  *
@@ -29,7 +30,16 @@ import org.xml.sax.helpers.DefaultHandler;
  */
 public class ConfigurationSAXMapper {
 
+    private ScooterServerTCP server;
+    
     private static String FICHERO = "config.xml";
+
+    public ConfigurationSAXMapper() {
+    }
+
+    public ConfigurationSAXMapper(ScooterServerTCP server) {
+        this.server = server;
+    }
 
     public ConfigurationMapper createMapper () {
         ConfigurationMapper configuracion = null;
@@ -39,7 +49,7 @@ public class ConfigurationSAXMapper {
             SAXParser saxParser;
             saxParser = factory.newSAXParser();
             
-            ConfigurationHandler handler = new ConfigurationHandler();
+            ConfigurationHandler handler = new ConfigurationHandler(server);
             saxParser.parse(new File("src/" + FICHERO), handler);
 
             // Ya está el manejador funcionando
@@ -55,6 +65,7 @@ public class ConfigurationSAXMapper {
 }
 
 class ConfigurationHandler extends DefaultHandler {
+    private ScooterServerTCP server;
 
     private ConfigurationMapper mapper;
     private ConfigurationMethod tempMethod;   // Variable temporal para almacenar el método
@@ -67,10 +78,11 @@ class ConfigurationHandler extends DefaultHandler {
     
     private StringBuilder buffer;
 
-    public ConfigurationHandler() {
+    public ConfigurationHandler(ScooterServerTCP server) {
         mapper = new ConfigurationMapper();
         buffer = new StringBuilder();
         objetosInstanciados = new HashMap<String,Object>();
+        this.server = server;
     }
     
     public Class getParamType (String classType) {
@@ -127,6 +139,11 @@ class ConfigurationHandler extends DefaultHandler {
                         obj = objetosInstanciados.get(nombreClase);
                     } else {
                         obj  = clase.newInstance();
+                        if (obj instanceof GenericController) {
+                            ((GenericController) obj).setServer(server);
+                        } else {
+                            System.err.println(nombreClase + " no hereda de GenericController.");
+                        }
                         objetosInstanciados.put(nombreClase, obj);
                     }
                     

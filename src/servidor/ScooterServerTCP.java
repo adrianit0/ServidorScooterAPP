@@ -8,13 +8,17 @@ package servidor;
 import configuration_server.ConfigurationMapper;
 import configuration_server.ConfigurationMethod;
 import configuration_server.ConfigurationSAXMapper;
+import entidades.Scooter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import servidor.ClienteInfo.Rol;
 import util.HibernateUtil;
 import util.Util;
 
@@ -28,6 +32,7 @@ public class ScooterServerTCP extends Thread{
     private ConfigurationMapper mapper;
     private final int port;
     
+    private ArrayList<Scooter> scooters;
     private LinkedHashMap<String, ClienteInfo> usuariosConectados; 
     
     private Thread thisThread= null;
@@ -42,6 +47,7 @@ public class ScooterServerTCP extends Thread{
         this.port = port;
         
         usuariosConectados = new LinkedHashMap<>(32);
+        scooters = new ArrayList<>();
         
         if (instance==null)
             instance=this;
@@ -58,7 +64,7 @@ public class ScooterServerTCP extends Thread{
         listening = true;
         
         System.out.println("Inicializando mapeadores de clases y métodos");
-        ConfigurationSAXMapper saxFactory = new ConfigurationSAXMapper();
+        ConfigurationSAXMapper saxFactory = new ConfigurationSAXMapper(this);
         mapper = saxFactory.createMapper();
         
         System.out.println("Inicializando Hibernate");
@@ -101,6 +107,14 @@ public class ScooterServerTCP extends Thread{
         stopServer ();
     }
     
+    public void addScooter (Scooter s) {
+        scooters.add(s);
+    }
+    
+    public List getScooters () {
+        return scooters;
+    }
+    
     public synchronized ConfigurationMethod getMethod (String uri) {
         return mapper.getMethod(uri);
     }
@@ -138,7 +152,7 @@ public class ScooterServerTCP extends Thread{
         // conectados. De no existir mandamos un error y obligamos al cliente a 
         // salirse de estar conectado.
         if (!usuariosConectados.containsKey(token)) {
-            System.out.println("Usuario con token " + token + " ha intentado entrar al servidor");
+            System.out.println("ScooterServerTCP::puedeRealizarAccion error: Usuario con token " + token + " ha intentado entrar al servidor pero no existe en el servidor");
             return false;
         }
 
@@ -147,7 +161,7 @@ public class ScooterServerTCP extends Thread{
         // Observamos si el token del usuario corresponde al usuario
         // Por seguridad eliminamos el token de sesión.
         if (!info.getNombre().equals(usuario)) {
-            System.out.println("Usuario con token " + token + " usa un nick diferente (" + usuario + " != " + info.getNombre() + ")");
+            System.out.println("ScooterServerTCP::puedeRealizarAccion error: Usuario con token " + token + " usa un nick diferente (" + usuario + " != " + info.getNombre() + ")");
             usuariosConectados.remove(token);
             return false;
         }
@@ -156,7 +170,8 @@ public class ScooterServerTCP extends Thread{
 
         // Si el usuario ha estado más de %outTime% sin hacer nada saldrá del servidor
         // Eliminamos el token ya que sabemos que no lo volveremos a utilizar
-        if (tiempoActual - info.getTimeSinceLastAction() > outTime) {
+        // Las Scooters no tendran tiempo de TimeOut
+        if (info.getRol() != Rol.SCOOTER && tiempoActual - info.getTimeSinceLastAction() > outTime) {
             usuariosConectados.remove(token);
             return false;
         }
@@ -168,7 +183,7 @@ public class ScooterServerTCP extends Thread{
     }
     
     
-    private synchronized String conectarUsuario(ClienteInfo info) {
+    public synchronized String conectarUsuario(ClienteInfo info) {
         // Si ya estuviera en la lista miramos si no se le ha caducado aún el token
         // de esta manera puede recuperarla
         // ¿Tal vez deba eliminar el token y dar otro para evitar que 2 personas con el mismo token jueguen
@@ -184,11 +199,31 @@ public class ScooterServerTCP extends Thread{
         }
 
         token = Util.crearTokenUsuario();
+        info.setTimeSinceLastAction(System.currentTimeMillis());
         usuariosConectados.put(token, info);
         System.out.println("Usuario con token " + token + " conectado.");
         return token;
     }
     
+    public synchronized boolean desconectarUsuario (String token) {
+        if (usuariosConectados.containsKey(token)) {
+            ClienteInfo info = usuariosConectados.remove(token);
+            
+            // Si es una scooter desconectamos tambien su estado
+            if (info.getRol()==Rol.SCOOTER) {
+                for (int i = 0; i < scooters.size(); i++) {
+                    if (scooters.get(0).getId().equals(info.getId())) {
+                        scooters.remove(scooters.get(0));
+                        break;
+                    }
+                }
+            }
+            
+            return true;
+        }
+        
+        return false;
+    }
     
     /**
      * Un puede realizar acción sin necesidad de dar el nick.
@@ -231,7 +266,7 @@ public class ScooterServerTCP extends Thread{
         if (info == null) {
             return false;
         }
-        return info.getRol() == 2;
+        return info.getRol() == Rol.ADMINISTRADOR;
     }
 
     public synchronized String containsName(String nick) {

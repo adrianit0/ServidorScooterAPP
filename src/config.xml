@@ -44,12 +44,21 @@
             </black-list>
         </mapping>
         
+        <!-- Métodos de pruebas -->
         <mapping link="test" className="testing.Ejecutador" method="test" return="String" token="false" >
             <params>
                 <param type="string" />
             </params>
         </mapping>
+        <mapping link="echo" className="controller.TestController" method="echo" return="map" token="false">
+            <params>
+                <param type="parameters" />
+            </params>
+        </mapping>
         
+        
+        
+        <!-- Métodos para el CLiente -->
         <mapping link="login" className="controller.UsuarioController" method="login" return="map" token="false">
             <params>
                 <param type="parameters" />
@@ -61,17 +70,42 @@
             </params>
         </mapping>
         
-        <mapping link="echo" className="controller.TestController" method="echo" return="map" token="false">
-            <params>
-                <param type="parameters" />
-            </params>
-        </mapping>
         
-        <mapping link="getEmpleados" className="controller.EmpleadoController" method="getEmpleados" return="map" token="false">
+        
+        <!-- Métodos para la administración -->
+        <mapping link="getEmpleados" className="controller.EmpleadoController" method="getEmpleados" return="map" token="true">
             <white-list>
                 <role name="administrador" />
                 <role name="directivo" />
             </white-list>
         </mapping>
+        <mapping link="getClientes" className="controller.EmpleadoController" method="getClientes" return="map" token="true">
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        
+        
+        
+        <!-- Métodos para las Scooters -->
+        <mapping link="loginScooter" className="controller.ScooterController" method="login" return="map" token="false">
+            <params>
+                <param type="parameters" />
+            </params>
+        </mapping>
+        <mapping link="getScooters" className="controller.ScooterController" method="getScootersCercanas" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="cliente" />
+                <role name="tecnico" />
+            </white-list>
+        </mapping>
+        
+        
+        
+        
     </mappers>
 </configuration-mapper>

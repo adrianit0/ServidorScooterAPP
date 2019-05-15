@@ -12,12 +12,20 @@ package servidor;
  * @author Adrián García
  */
 public class ClienteInfo {
+    public enum Rol {
+        CLIENTE, ADMINISTRADOR, TECNICO, SCOOTER
+    };
     private long id;
     private String nombre;
     private long timeSinceLastAction;   // Tiempo que ha pasado desde la última acción.
-    private int rol;                    // Rol que tiene el cliente
+    private Rol rol;                    // Rol que tiene el cliente
 
-    public ClienteInfo(long id, String nombre, long timeSinceLastAction, int rol) {
+    public ClienteInfo() {
+    }
+
+    
+    
+    public ClienteInfo(long id, String nombre, long timeSinceLastAction, Rol rol) {
         this.id = id;
         this.nombre = nombre;
         this.timeSinceLastAction = timeSinceLastAction;
@@ -48,11 +56,11 @@ public class ClienteInfo {
         this.timeSinceLastAction = timeSinceLastAction;
     }
 
-    public int getRol() {
+    public Rol getRol() {
         return rol;
     }
 
-    public void setRol(int rol) {
+    public void setRol(Rol rol) {
         this.rol = rol;
     }
 }

@@ -7,6 +7,7 @@ package controller;
 
 import configuration_server.GenericController;
 import entidades.Cliente;
+import entidades.Empleado;
 import excepciones.ExecuteError;
 import java.util.HashMap;
 import java.util.List;
@@ -20,12 +21,26 @@ import util.Util;
 public class EmpleadoController extends GenericController {
     
     public Map<String, String> getEmpleados() throws ExecuteError {
+        List<Empleado> empleados = this.getHManager().getObjects("Empleado");
         
+        if (empleados==null || empleados.isEmpty()) {
+            throw new ExecuteError ("No se ha encontrado ningún empleado", null);
+        }
         
+        Map<String, String> result = new HashMap<>();
+        result.put("length", empleados.size()+"");
+        for (int i = 0; i < empleados.size(); i++) {
+             result.putAll(Util.convertObjectToMap(empleados.get(i), "["+i+"]"));
+        }
+        
+        return result;
+    }
+    
+    public Map<String, String> getClientes() throws ExecuteError {
         List<Cliente> clientes = this.getHManager().getObjects("Cliente");
         
-        if (clientes==null) {
-            throw new ExecuteError ("No se ha encontrado un cliente", null);
+        if (clientes==null || clientes.isEmpty()) {
+            throw new ExecuteError ("No se ha encontrado ningún cliente", null);
         }
         
         Map<String, String> result = new HashMap<>();
@@ -35,7 +50,6 @@ public class EmpleadoController extends GenericController {
         }
         
         return result;
-        
     }
     
 }

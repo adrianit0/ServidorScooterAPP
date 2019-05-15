@@ -48,3 +48,5 @@ INSERT INTO sede (nombre, direccion, ciudad_id) VALUES
 
 INSERT INTO empleado (nombre, apellido1, apellido2, dni, direccion, email, pass, sueldo, puesto_id, ciudad_id, sede_id) VALUES
     ('Administrador', 'Admin', null, '12345678A', 'Foo Street', 'admin', '1234', 0, 1, 1, 1);
+
+INSERT INTO modelo (marca, modelo) VALUES ('Honda', 'PCX 108');

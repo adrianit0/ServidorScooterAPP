@@ -30,6 +30,13 @@ public class ExecuteError extends Exception{
         
         this.params.put("error", message);
     }
+    
+    public ExecuteError (String message) {
+        super(message);
+        
+        this.params=new HashMap<String,String>();
+        this.params.put("error", message);
+    }
 
     public Map<String, String> getParams() {
         return params;

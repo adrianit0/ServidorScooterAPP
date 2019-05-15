@@ -17,17 +17,20 @@
         <property name="codigo" type="int">
             <column name="codigo" not-null="true" unique="true" />
         </property>
+        <property name="noSerie" type="string">
+            <column name="noSerie" length="10" not-null="true" unique="true" />
+        </property>
         <property name="fechaCompra" type="date">
             <column name="fechaCompra" length="10" not-null="true" />
         </property>
         <property name="precioCompra" type="double">
             <column name="precioCompra" precision="8" not-null="true" />
         </property>
-        <property name="posicionLat" type="java.lang.Integer">
+        <property name="posicionLat" type="java.lang.Double">
             <column name="posicionLat" />
         </property>
-        <property name="posicionAlt" type="java.lang.Integer">
-            <column name="posicionAlt" />
+        <property name="posicionLon" type="java.lang.Double">
+            <column name="posicionLon" />
         </property>
         <set name="estadoscooters" table="estadoscooter" inverse="true" lazy="true" fetch="select">
             <key>

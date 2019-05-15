@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import servidor.ClienteInfo;
 import util.HibernateManager;
 import util.Util;
 
@@ -45,7 +46,12 @@ public class UsuarioController extends GenericController implements IUsuarioCont
         Map<String, String> result = Util.convertObjectToMap(cliente);
         
         // Generamos, almacenamos y enviamos el token. Tiene que ser aleatoria.
-        String token = Util.crearTokenUsuario();
+        ClienteInfo info = new ClienteInfo ();
+        info.setNombre(cliente.getNick());
+        info.setId(cliente.getId());
+        info.setRol(ClienteInfo.Rol.CLIENTE);
+        
+        String token = this.getServer().conectarUsuario(info);
         result.put("token", token);
         
         return result;

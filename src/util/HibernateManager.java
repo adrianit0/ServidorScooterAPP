@@ -184,5 +184,47 @@ public class HibernateManager {
             session.close();
         }
     }
+    
+    /**
+     * Actualiza el contenido de un objeto que exista en la tabla.
+     */
+    public boolean updateObject (Object object){
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = null; 
+        
+        try{ 
+            tx = session.beginTransaction(); 
+            session.update(object);
+            tx.commit();
+            return true;
+        }catch (HibernateException e) {
+            if (tx!=null) tx.rollback();
+            e.printStackTrace(); 
+            return false;
+        }finally { 
+            session.close();
+        } 
+    }
+    
+    /**
+     * Elimina un objeto de la base de datos que exista en la tabla
+     */
+    public boolean deleteObject (Object object) {
+        Session session = HibernateUtil.getSessionFactory().openSession(); 
+        Transaction tx = null;
+        try{
+            tx = session.beginTransaction(); 
+            //Empleado employee = (Empleado)session.get(Empleado.class, EmployeeID);
+            session.delete(object);
+            tx.commit();
+            return true;
+        }catch (HibernateException e) { 
+            if (tx!=null) tx.rollback();
+            e.printStackTrace();
+            return false;
+        }finally {
+            session.close(); 
+        }
+    }
 
 }

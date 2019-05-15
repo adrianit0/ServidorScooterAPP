@@ -68,8 +68,15 @@ public class ScooterServerThread extends Thread {
         }
         
         try {
+            boolean desconectado = servidor.desconectarUsuario(""); //TODO: Incluir aquí el token de sesión
             socket.close();
-            System.out.println("Thread cerrado");
+            
+            if (desconectado) {
+                System.out.println("Thread cerrado satisfactoriamente");
+            } else {
+                System.out.println("Thread cerrado, pero no se ha podido eliminar su información de sesión");
+            }
+            
         } catch (IOException e) {
             System.err.println("No se puede cerrar el thread: " + e.getMessage() ) ;
         }
@@ -98,8 +105,9 @@ public class ScooterServerThread extends Thread {
             boolean puedeRealizarAccion = servidor.puedeRealizarAccion(packServer.getToken(), packServer.getNick());
 
             if (!puedeRealizarAccion) {
-                System.out.println("Error ScooterServerUDP::ejecutarMetodo: No puede ejecutar método");
+                System.out.println("ScooterServerThread::ejecutarMetodo error: No puede ejecutar método. No tiene los permisos");
                 errores = true;
+                System.out.println("Token: " + packServer.getToken());
                 if (packServer.getToken().isEmpty()) {
                     error = "No existe token para esta sesión";
                 } else if (!servidor.estaConectado(packServer.getToken())) {
@@ -123,7 +131,7 @@ public class ScooterServerThread extends Thread {
 
             if (result==null) {
                 result=new HashMap<>();
-                result.put("error", "No se ha podido ejecutar el método");
+                result.put("error", "Error: El método " + packServer.getUri() + " se ha ejecutado, pero no ha devuelto nada");
             }
             
             // Guarda los nuevos argumentos devueltos

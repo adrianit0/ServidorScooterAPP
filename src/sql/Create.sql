@@ -33,13 +33,14 @@ CREATE TABLE IF NOT EXISTS Modelo (
 
 CREATE TABLE IF NOT EXISTS Scooter (
     id INT PRIMARY KEY AUTO_INCREMENT,
+    noSerie VARCHAR(10) NOT NULL UNIQUE,
     matricula VARCHAR(7) NOT NULL UNIQUE,
     codigo INT(6) NOT NULL UNIQUE,
     fechaCompra DATE NOT NULL,
     precioCompra DOUBLE(8,2) NOT NULL,
     -- Posición almacenada en la tabla sobre la scooter
-    posicionLat INT(15),
-    posicionAlt INT(15),
+    posicionLat DECIMAL(10,6),
+    posicionLon DECIMAL(10,6),
     -- Claves foreaneas
     modelo_id INT NOT NULL,
     CONSTRAINT moscfk FOREIGN KEY (modelo_id) REFERENCES Modelo (id)

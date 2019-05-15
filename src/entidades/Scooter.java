@@ -13,13 +13,14 @@ public class Scooter  implements java.io.Serializable {
 
 
      private Integer id;
+     private String noSerie;
      private Modelo modelo;
      private String matricula;
      private int codigo;
      private Date fechaCompra;
      private double precioCompra;
-     private Integer posicionLat;
-     private Integer posicionAlt;
+     private Double posicionLat;
+     private Double  posicionLon;
      private Set estadoscooters = new HashSet(0);
      private Set sedes = new HashSet(0);
      private Set mantenimientos = new HashSet(0);
@@ -35,18 +36,28 @@ public class Scooter  implements java.io.Serializable {
         this.fechaCompra = fechaCompra;
         this.precioCompra = precioCompra;
     }
-    public Scooter(Modelo modelo, String matricula, int codigo, Date fechaCompra, double precioCompra, Integer posicionLat, Integer posicionAlt, Set estadoscooters, Set sedes, Set mantenimientos) {
-       this.modelo = modelo;
-       this.matricula = matricula;
-       this.codigo = codigo;
-       this.fechaCompra = fechaCompra;
-       this.precioCompra = precioCompra;
-       this.posicionLat = posicionLat;
-       this.posicionAlt = posicionAlt;
-       this.estadoscooters = estadoscooters;
-       this.sedes = sedes;
-       this.mantenimientos = mantenimientos;
+
+    public Scooter(String noSerie, Modelo modelo, String matricula, int codigo, Date fechaCompra, double precioCompra, Double  posicionLat, Double  posicionLon) {
+        this.noSerie = noSerie;
+        this.modelo = modelo;
+        this.matricula = matricula;
+        this.codigo = codigo;
+        this.fechaCompra = fechaCompra;
+        this.precioCompra = precioCompra;
+        this.posicionLat = posicionLat;
+        this.posicionLon = posicionLon;
     }
+    
+
+    public String getNoSerie() {
+        return noSerie;
+    }
+
+    public void setNoSerie(String noSerie) {
+        this.noSerie = noSerie;
+    }
+    
+    
    
     public Integer getId() {
         return this.id;
@@ -90,20 +101,22 @@ public class Scooter  implements java.io.Serializable {
     public void setPrecioCompra(double precioCompra) {
         this.precioCompra = precioCompra;
     }
-    public Integer getPosicionLat() {
+    public Double  getPosicionLat() {
         return this.posicionLat;
     }
     
-    public void setPosicionLat(Integer posicionLat) {
+    public void setPosicionLat(Double  posicionLat) {
         this.posicionLat = posicionLat;
     }
-    public Integer getPosicionAlt() {
-        return this.posicionAlt;
+
+    public Double  getPosicionLon() {
+        return posicionLon;
+    }
+
+    public void setPosicionLon(Double  posicionLon) {
+        this.posicionLon = posicionLon;
     }
     
-    public void setPosicionAlt(Integer posicionAlt) {
-        this.posicionAlt = posicionAlt;
-    }
     public Set getEstadoscooters() {
         return this.estadoscooters;
     }

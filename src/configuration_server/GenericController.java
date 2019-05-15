@@ -5,6 +5,7 @@
  */
 package configuration_server;
 
+import servidor.ScooterServerTCP;
 import util.HibernateManager;
 
 /**
@@ -16,8 +17,25 @@ import util.HibernateManager;
 public class GenericController {
     
     private HibernateManager mh = new HibernateManager();
+    private ScooterServerTCP server;
 
     public HibernateManager getHManager() {
         return mh;
+    }
+
+    public HibernateManager getMh() {
+        return mh;
+    }
+
+    public void setMh(HibernateManager mh) {
+        this.mh = mh;
+    }
+
+    public ScooterServerTCP getServer() {
+        return server;
+    }
+
+    public void setServer(ScooterServerTCP server) {
+        this.server = server;
     }
 }
