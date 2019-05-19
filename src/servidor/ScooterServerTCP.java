@@ -34,6 +34,7 @@ public class ScooterServerTCP extends Thread{
     
     private ArrayList<Scooter> scooters;
     private LinkedHashMap<String, ClienteInfo> usuariosConectados; 
+    private LinkedHashMap<Integer, Socket> socketsConectados;
     
     private Thread thisThread= null;
     private boolean listening;
@@ -46,6 +47,7 @@ public class ScooterServerTCP extends Thread{
     public ScooterServerTCP (int port) {
         this.port = port;
         
+        socketsConectados = new LinkedHashMap<>(32);
         usuariosConectados = new LinkedHashMap<>(32);
         scooters = new ArrayList<>();
         
@@ -100,7 +102,9 @@ public class ScooterServerTCP extends Thread{
                 }
                 throw new RuntimeException("El cliente no puede conectarse - Error", e);
             }
-            new ScooterServerThread(clientSocket, this).start();
+            Integer idThread = clientSocket.hashCode();
+            socketsConectados.put(idThread, clientSocket);
+            new ScooterServerThread(clientSocket, idThread, this).start();
         }
         System.out.println("Server has Stopped...Please check") ;
         
@@ -192,6 +196,7 @@ public class ScooterServerTCP extends Thread{
         if (token != null) {
             boolean vigente = puedeRealizarAccion(token, info.getNombre());
             if (vigente) {
+                usuariosConectados.get(token).setIdThread(info.getIdThread());
                 System.out.println("Usuario con token " + token + " se ha reconectado.");
                 return token;
             }
@@ -205,9 +210,26 @@ public class ScooterServerTCP extends Thread{
         return token;
     }
     
-    public synchronized boolean desconectarUsuario (String token) {
-        if (usuariosConectados.containsKey(token)) {
-            ClienteInfo info = usuariosConectados.remove(token);
+    public synchronized boolean desconectarUsuario (Integer idThread) {
+        if (idThread==null) {
+            System.err.println("ScooterServerTCP::desconectarUsuario: No se ha enviado ningún id Thread");
+            return false;
+        }
+        
+        if (socketsConectados.containsKey(idThread)) {
+            ClienteInfo info = null;
+            // Buscamos el usuario si está incluido
+            for (Map.Entry<String, ClienteInfo> entry : usuariosConectados.entrySet()) {
+                ClienteInfo value = entry.getValue();
+                
+                if (value.getIdThread().equals(idThread)) {
+                    info = value;
+                    break;
+                }
+            }
+            
+            if (info==null)
+                return false;
             
             // Si es una scooter desconectamos tambien su estado
             if (info.getRol()==Rol.SCOOTER) {
@@ -218,6 +240,9 @@ public class ScooterServerTCP extends Thread{
                     }
                 }
             }
+            
+            // No desconectaremos el infoClient, tan solo dejaremos idThread en null
+            info.setIdThread(null);
             
             return true;
         }

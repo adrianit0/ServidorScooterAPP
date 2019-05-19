@@ -31,6 +31,7 @@ public class UsuarioController extends GenericController implements IUsuarioCont
     public Map<String, String> login(Map<String, String> parameters) throws ExecuteError {
         String nick = parameters.get("nick");
         String pass = parameters.get("pass");
+        Integer idThread = Integer.parseInt(parameters.get("idThread"));
         
         // Añadimos los criterios para que Hibernate haga la búsqueda
         Map<String,String> criterios = new HashMap<>();
@@ -50,6 +51,7 @@ public class UsuarioController extends GenericController implements IUsuarioCont
         info.setNombre(cliente.getNick());
         info.setId(cliente.getId());
         info.setRol(ClienteInfo.Rol.CLIENTE);
+        info.setIdThread(idThread);
         
         String token = this.getServer().conectarUsuario(info);
         result.put("token", token);

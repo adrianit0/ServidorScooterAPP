@@ -28,6 +28,7 @@ public class ScooterController extends GenericController {
         double latitud;
         double longitud;
         int codigo;
+        int idThread;
         boolean bloqueado;
         String noSerie;
         
@@ -36,6 +37,7 @@ public class ScooterController extends GenericController {
             latitud = Double.parseDouble(parametros.get("latitud"));
             longitud = Double.parseDouble(parametros.get("longitud"));
             codigo = Integer.parseInt(parametros.get("codigo"));
+            idThread = Integer.parseInt(parametros.get("idThread"));
             noSerie = parametros.get("noSerie");
             bloqueado = Boolean.parseBoolean(parametros.get("bloqueado"));
         } catch (NumberFormatException e) {
@@ -96,6 +98,7 @@ public class ScooterController extends GenericController {
         info.setId(scooter.getId());
         info.setNombre(noSerie);
         info.setRol(ClienteInfo.Rol.SCOOTER);
+        info.setIdThread(idThread);
         String token = this.getServer().conectarUsuario(info);
         
         this.getServer().addScooter(scooter);
@@ -112,6 +115,10 @@ public class ScooterController extends GenericController {
         
         final Double diferencia = 0.001d; // No se cuanta diferencia es esto
         
+        if (!parametros.containsKey("lat")|| !parametros.containsKey("lon")) {
+            throw new ExecuteError ("Faltan parametros para realizar la consulta");
+        }
+        
         try {
             lat = Double.parseDouble(parametros.get("lat"));
             lon = Double.parseDouble(parametros.get("lon"));
@@ -120,12 +127,17 @@ public class ScooterController extends GenericController {
         }
         
         List<Scooter> scooters = this.getServer().getScooters();
+        
+        // FILTRAR
         List<Scooter> encontradas = new ArrayList<>();
         for (Scooter s : scooters) {
             
         }
         
-        return null;
+        Map<String,String> lista = util.Util.convertListToMap(scooters);
+        lista.put("length", scooters.size()+"");
+        
+        return lista;
     }
     
 }

@@ -10,6 +10,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.regex.Pattern;
 
@@ -274,6 +275,8 @@ public class Util {
      *  Convierte los objetos de una trama de datos
     */
     private static String convertirObjetos (String trama, IPaquete contenido) {
+        if (trama==null || contenido==null)
+            return "";
         int firstPos = -1;
         int lastPos = -1;
         int founds = 0;
@@ -406,11 +409,29 @@ public class Util {
                     Method metodo = clase.getMethod (methodName);
                     Object o = metodo.invoke(obj);
                     
+                    System.out.println(o);
                     parametros.put(f.getName()+extra, o==null?null:o.toString());
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                     System.err.println("Error en "+ f.getName() + ": "+ex.getMessage() + " ("+ex.getClass().getName()+")");
                 }
             }
+        }
+        
+        return parametros;
+    }
+    
+    public static Map<String,String> convertListToMap (List lista) {
+        return convertListToMap(lista, "[", "]");
+    }
+    
+    public static Map<String,String> convertListToMap (List lista, String extraPre, String extraPost) {
+        Map<String,String> parametros = new HashMap<>();
+        
+        int i = 0;
+        for (Object o : lista) {
+            parametros.putAll(convertObjectToMap(o, extraPre+i+extraPost));
+            
+            i++;
         }
         
         return parametros;

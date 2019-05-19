@@ -31,11 +31,14 @@ public class ScooterServerThread extends Thread {
     private PrintWriter out;
     private BufferedReader in;
     
+    private Integer idThread;
+    
     private boolean listening;
     
-    public ScooterServerThread(Socket socket, ScooterServerTCP servidor) {
+    public ScooterServerThread(Socket socket, Integer idThread, ScooterServerTCP servidor) {
 	super("ScooterAPP server");
 	this.socket = socket;
+        this.idThread = idThread;
         this.servidor = servidor;
         
         this.listening = true;
@@ -47,7 +50,7 @@ public class ScooterServerThread extends Thread {
             out = new PrintWriter(socket.getOutputStream(), true);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
         } catch (IOException e) {
-            System.err.println("No se puede hacer la conexión: " + e.getMessage());
+            System.err.println("ScooterServerThread::run: No se puede hacer la conexión: " + e.getMessage());
         }
         
         String inputLine, outputLine;
@@ -62,23 +65,23 @@ public class ScooterServerThread extends Thread {
                 out.println(outputLine);
                 
             } catch (IOException e) {
-                System.err.println("No se ha podido realizar la consulta: " + e.getMessage());
+                System.err.println("ScooterServerThread::run: No se ha podido realizar la consulta: " + e.getMessage());
                 listening=false;
             }
         }
         
         try {
-            boolean desconectado = servidor.desconectarUsuario(""); //TODO: Incluir aquí el token de sesión
+            boolean desconectado = servidor.desconectarUsuario(idThread);
             socket.close();
             
             if (desconectado) {
-                System.out.println("Thread cerrado satisfactoriamente");
+                System.out.println("ScooterServerThread::run: Thread cerrado satisfactoriamente");
             } else {
-                System.out.println("Thread cerrado, pero no se ha podido eliminar su información de sesión");
+                System.out.println("ScooterServerThread::run: Thread cerrado, pero no se ha podido eliminar su información de sesión");
             }
             
         } catch (IOException e) {
-            System.err.println("No se puede cerrar el thread: " + e.getMessage() ) ;
+            System.err.println("ScooterServerThread::run: No se puede cerrar el thread: " + e.getMessage() ) ;
         }
     }
     
@@ -101,7 +104,7 @@ public class ScooterServerThread extends Thread {
         }
 
         // Si el método necesita token, se tendrá que comprobar que el usuario/token es el mismo
-        if (metodo.isToken()) {
+        if (!errores && metodo.isToken()) {
             boolean puedeRealizarAccion = servidor.puedeRealizarAccion(packServer.getToken(), packServer.getNick());
 
             if (!puedeRealizarAccion) {
@@ -127,6 +130,8 @@ public class ScooterServerThread extends Thread {
         
         // Hacer que el return sea especifico. No como ahora que siempre devolverá un Map<String,String>
         if (!errores) {
+            // Incluimos el idthread, necesario para acceder a este Thread desde el controlador
+            packServer.getArgumentos().put("idThread", idThread+"");
             Map<String, String> result = (Map<String, String>) metodo.invoke(packServer.getArgumentos());
 
             if (result==null) {

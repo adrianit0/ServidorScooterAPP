@@ -2,6 +2,7 @@ package entidades;
 // Generated 28-abr-2019 23:19:03 by Hibernate Tools 4.3.1
 
 
+import anotaciones.Ignore;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +15,7 @@ public class Scooter  implements java.io.Serializable {
 
      private Integer id;
      private String noSerie;
+     @Ignore
      private Modelo modelo;
      private String matricula;
      private int codigo;
@@ -21,8 +23,11 @@ public class Scooter  implements java.io.Serializable {
      private double precioCompra;
      private Double posicionLat;
      private Double  posicionLon;
+     @Ignore
      private Set estadoscooters = new HashSet(0);
+     @Ignore
      private Set sedes = new HashSet(0);
+     @Ignore
      private Set mantenimientos = new HashSet(0);
 
     public Scooter() {

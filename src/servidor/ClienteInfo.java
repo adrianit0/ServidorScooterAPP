@@ -19,17 +19,20 @@ public class ClienteInfo {
     private String nombre;
     private long timeSinceLastAction;   // Tiempo que ha pasado desde la última acción.
     private Rol rol;                    // Rol que tiene el cliente
+    
+    private Integer idThread;
 
     public ClienteInfo() {
     }
 
     
     
-    public ClienteInfo(long id, String nombre, long timeSinceLastAction, Rol rol) {
+    public ClienteInfo(long id, String nombre, long timeSinceLastAction, Rol rol, Integer idThread) {
         this.id = id;
         this.nombre = nombre;
         this.timeSinceLastAction = timeSinceLastAction;
         this.rol = rol;
+        this.idThread = idThread;
     }
 
     public long getId() {
@@ -63,4 +66,14 @@ public class ClienteInfo {
     public void setRol(Rol rol) {
         this.rol = rol;
     }
+
+    public Integer getIdThread() {
+        return idThread;
+    }
+
+    public void setIdThread(Integer idThread) {
+        this.idThread = idThread;
+    }
+    
+    
 }

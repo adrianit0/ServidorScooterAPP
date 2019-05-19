@@ -69,6 +69,11 @@ public class ConfigurationMethod {
                 
                 return error.getParams();
             }
+            
+            System.err.println("ConfigurationMethod::invoke error: " + e.getCause().getMessage());
+            if (e!=null && e.getCause()!=null)
+                e.getCause().printStackTrace();
+            
         }
         return null;
     }
