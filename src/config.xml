@@ -114,7 +114,16 @@
         
         
         <!-- Métodos para la administración -->
-        <mapping link="getEmpleados" className="controller.EmpleadoController" method="getEmpleados" return="map" token="true">
+        <mapping link="getEmpleados" className="controller.EmpleadoController" method="getEmpleados" return="map" token="false">
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="getEmpleado" className="controller.EmpleadoController" method="getEmpleado" return="map" token="false">
+            <params>
+                <param type="parameters" />
+            </params>
             <white-list>
                 <role name="administrador" />
                 <role name="directivo" />
@@ -137,7 +146,7 @@
                 <role name="directivo" />
             </white-list>
         </mapping>
-        <mapping link="updateEmpleado" className="controller.CrudController" method="createEmpleado" return="map" token="true">
+        <mapping link="updateEmpleado" className="controller.CrudController" method="updateEmpleado" return="map" token="true">
             <params>
                 <param type="parameters" />
             </params>
@@ -146,7 +155,7 @@
                 <role name="directivo" />
             </white-list>
         </mapping>
-        <mapping link="deleteEmpleado" className="controller.CrudController" method="createEmpleado" return="map" token="true">
+        <mapping link="deleteEmpleado" className="controller.CrudController" method="deleteEmpleado" return="map" token="true">
             <params>
                 <param type="parameters" />
             </params>

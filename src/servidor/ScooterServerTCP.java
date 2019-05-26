@@ -222,7 +222,7 @@ public class ScooterServerTCP extends Thread{
             for (Map.Entry<String, ClienteInfo> entry : usuariosConectados.entrySet()) {
                 ClienteInfo value = entry.getValue();
                 
-                if (value.getIdThread().equals(idThread)) {
+                if (value!=null && value.getIdThread()!=null && value.getIdThread().equals(idThread)) {
                     info = value;
                     break;
                 }

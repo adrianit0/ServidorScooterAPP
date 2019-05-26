@@ -9,6 +9,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -375,8 +376,27 @@ public class Util {
         return texto;
     }
     
+    public static List convertMapToList (Class clase, Map<String,String> parametros){
+        List lista = new ArrayList();
+        
+        int length = Integer.parseInt(parametros.get("length"));
+        
+        for (int i = 0; i < length; i++) {
+            Object o = convertMapToObject(clase, parametros, "["+i+"]");
+            if (o!=null) {
+                lista.add(o);
+            }
+        }
+        
+        return lista;
+    }
+    
+    public static Object convertMapToObject (Class clase, Map<String,String> parametros) { 
+        return convertMapToObject(clase, parametros, "");
+    }
+    
     // FIXME: TODO: Hacer esto
-    public static Object convertMapToObject (Class clase, Map<String,String> parametros) {
+    public static Object convertMapToObject (Class clase, Map<String,String> parametros, String extra) {
         Field[] campos = clase.getDeclaredFields();
         Object obj=null;
         try {
@@ -413,26 +433,31 @@ public class Util {
                     
                     Method metodo = clase.getMethod (methodName, returnType);
                     
-                    Object objectConverted = parametros.get(f.getName());
+                    
+                    String parametro = parametros.get(f.getName()+extra);
+                    Object objectConverted = parametro;
+                    if (parametro!=null && parametro.equals("null"))
+                        objectConverted = null;
                     if (objectConverted!=null) {
                         switch (returnType.getSimpleName()) {
                             case "String":
+                                objectConverted = parametro;
                                 break;
                             case "Integer":
                             case "int":
-                                objectConverted = Integer.parseInt(parametros.get(f.getName()));
+                                objectConverted = Integer.parseInt(parametro);
                                 break;
                             case "Double":
                             case "double":
-                                objectConverted = Double.parseDouble(parametros.get(f.getName()));
+                                objectConverted = Double.parseDouble(parametro);
                                 break;
                             case "Float":
                             case "float":
-                                objectConverted = Float.parseFloat(parametros.get(f.getName()));
+                                objectConverted = Float.parseFloat(parametro);
                                 break;
                             case "Boolean":
                             case "boolean":
-                                objectConverted = Boolean.parseBoolean(parametros.get(f.getName()));
+                                objectConverted = Boolean.parseBoolean(parametro);
                             default:
                                 System.err.println("Util::convertMapToObject error: "+returnType.getCanonicalName() + " no es compatible con el parseo");
                                 break;
@@ -465,6 +490,7 @@ public class Util {
         
         Map<String,String> parametros = new HashMap<>();
         
+        String methodName = null;
         for (Field f : campos) {
             String genericType = f.getGenericType().toString().split(" ")[0];
             
@@ -479,9 +505,11 @@ public class Util {
                         }
                     }
                     if (ignore) continue;
+                   
+                    String methodType = (f.getGenericType().getTypeName().toLowerCase().contains("bool")) ? "is" : "get";
                     
-                    String methodName = f.getName();
-                    methodName = "get" + methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
+                    methodName = f.getName();
+                    methodName = methodType + methodName.substring(0, 1).toUpperCase() + methodName.substring(1);
                     
                     Method metodo = clase.getMethod (methodName);
                     Object o = metodo.invoke(obj);
@@ -490,6 +518,8 @@ public class Util {
                     parametros.put(f.getName()+extra, o==null?null:o.toString());
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
                     System.err.println("Error en "+ f.getName() + ": "+ex.getMessage() + " ("+ex.getClass().getName()+")");
+                } catch (org.hibernate.LazyInitializationException e) {
+                    System.err.println("Util::convertObjectToMap: El método " + methodName + "() tiene valor lazy (Corregir)");
                 }
             }
         }

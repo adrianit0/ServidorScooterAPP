@@ -5,8 +5,12 @@
  */
 package util;
 
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.hibernate.HibernateException;
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -137,6 +141,35 @@ public class HibernateManager {
             }
             e.printStackTrace();
         } finally {
+            session.close();
+        }
+
+        return objeto;
+    }
+    
+    public Object getObjectWithoutLazyObjects(Class clase, Integer primaryKey, String... methods) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = null;
+
+        Object objeto = null;
+
+        try {
+            tx = session.beginTransaction();
+            objeto = session.get(clase, primaryKey);
+            
+            // Forzamos a Hibernate a ejecutar ciertos métodos para tomarlo del servidor
+            for (String m : methods) {
+                Method meth = objeto.getClass().getMethod(m);
+                meth.invoke(objeto);
+            }
+            
+            tx.commit();
+        } catch (HibernateException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        }finally {
             session.close();
         }
 

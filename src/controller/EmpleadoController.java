@@ -36,6 +36,17 @@ public class EmpleadoController extends GenericController {
         return result;
     }
     
+    public Map<String, String> getEmpleado(Map<String,String> parametros) throws ExecuteError {
+        Integer id = Integer.parseInt(parametros.get("id"));
+        Empleado empleado = (Empleado) this.getHManager().getObject(Empleado.class, id);
+        
+        if (empleado==null) 
+            throw new ExecuteError ("No se ha encontrado al empleado con ID " + id);
+        
+        Map<String, String> result = util.Util.convertObjectToMap(empleado);
+        return result;
+    }
+    
     public Map<String, String> getClientes() throws ExecuteError {
         List<Cliente> clientes = this.getHManager().getObjects("Cliente");
         
