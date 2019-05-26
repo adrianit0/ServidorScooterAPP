@@ -8,6 +8,7 @@ package testing;
 import configuration_server.ConfigurationMapper;
 import configuration_server.ConfigurationSAXMapper;
 import entidades.Cliente;
+import entidades.Empleado;
 import excepciones.MapperException;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
@@ -48,6 +49,18 @@ public class Main {
         System.out.println(reconverted);*/
         //System.out.println((texto.equals(reconverted)?"Son iguales":"No son iguales"));
         
+        Map<String,String> parametros = new HashMap<>();
+        parametros.put("nombre", "Adrian");
+        parametros.put("sueldo", "564.6");
+        
+        Empleado e = new Empleado();
+        e = (Empleado ) util.Util.convertMapToObject(Empleado.class, parametros);
+        
+        System.out.println(e.getSueldo());
+        System.out.println(e.getNombre());
+    }
+    
+    private void test () {
         String texto = "0;1;2;login;nick:jose;scooter:{id:1;modelo:{id:1;marca:fiat}};valor:{credito:euros;cantidad:2}";
         
         Map<String,String> objetos = new HashMap<>();
@@ -135,7 +148,6 @@ public class Main {
             
             System.out.println(key + " - " + value);
         }
-        
     }
     
     private void ejecutarMetodo () throws MapperException {

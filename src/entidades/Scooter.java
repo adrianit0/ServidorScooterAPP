@@ -15,9 +15,11 @@ public class Scooter  implements java.io.Serializable {
 
      private Integer id;
      private String noSerie;
+     private Float bateria;
      @Ignore
      private Modelo modelo;
      private String matricula;
+     private boolean estaBloqueada;
      private int codigo;
      private Date fechaCompra;
      private double precioCompra;
@@ -31,6 +33,7 @@ public class Scooter  implements java.io.Serializable {
      private Set mantenimientos = new HashSet(0);
 
     public Scooter() {
+        
     }
 
 	
@@ -52,7 +55,22 @@ public class Scooter  implements java.io.Serializable {
         this.posicionLat = posicionLat;
         this.posicionLon = posicionLon;
     }
-    
+
+    public Float getBateria() {
+        return bateria;
+    }
+
+    public void setBateria(Float bateria) {
+        this.bateria = bateria;
+    }
+
+    public boolean isEstaBloqueada() {
+        return estaBloqueada;
+    }
+
+    public void setEstaBloqueada(boolean estaBloqueada) {
+        this.estaBloqueada = estaBloqueada;
+    }
 
     public String getNoSerie() {
         return noSerie;

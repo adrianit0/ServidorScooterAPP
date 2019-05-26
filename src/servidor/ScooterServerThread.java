@@ -91,38 +91,50 @@ public class ScooterServerThread extends Thread {
      */
     private String ejecutarMetodo(String contenido) {
         String error = "Undefined";
-        PaqueteServidor packServer = Util.unpackToServer(contenido);
-
-        ConfigurationMethod metodo = servidor.getMethod(packServer.getUri());
-
         boolean errores = false;
-
-        if (metodo == null) {
-            System.err.println("Método " + packServer.getUri() + " no existe");
+        if (contenido==null || contenido.isEmpty()) {
+            error = "Trama vacía";
             errores = true;
-            packServer.getArgumentos().put("error", "Método " + packServer.getUri() + " no existe");
         }
+        PaqueteServidor packServer = Util.unpackToServer(contenido);
+        if (packServer==null)
+            packServer= new PaqueteServidor();
+        
+        ConfigurationMethod metodo = null;
+        
+        if (!errores){
+            metodo = servidor.getMethod(packServer.getUri());
 
-        // Si el método necesita token, se tendrá que comprobar que el usuario/token es el mismo
-        if (!errores && metodo.isToken()) {
-            boolean puedeRealizarAccion = servidor.puedeRealizarAccion(packServer.getToken(), packServer.getNick());
-
-            if (!puedeRealizarAccion) {
-                System.out.println("ScooterServerThread::ejecutarMetodo error: No puede ejecutar método. No tiene los permisos");
+            if (metodo == null) {
+                System.err.println("Método " + packServer.getUri() + " no existe");
                 errores = true;
-                System.out.println("Token: " + packServer.getToken());
-                if (packServer.getToken().isEmpty()) {
-                    error = "No existe token para esta sesión";
-                } else if (!servidor.estaConectado(packServer.getToken())) {
-                    error = "No hay token de sesión para este usuario";
-                } else {
-                    error = "El token de sesión no coincide";
-                }
+                packServer.getArgumentos().put("error", "Método " + packServer.getUri() + " no existe");
             }
-            
-            // Añadir la securización de WHITE-LIST y BLACK-LIST
-            // Estas listas solo estaran disponible junto con la tokenización
-            
+
+            // Si el método necesita token, se tendrá que comprobar que el usuario/token es el mismo
+            if (!errores && metodo!=null &&  metodo.isToken()) {
+                boolean puedeRealizarAccion = servidor.puedeRealizarAccion(packServer.getToken(), packServer.getNick());
+
+                if (!puedeRealizarAccion) {
+                    System.out.println("ScooterServerThread::ejecutarMetodo error: No puede ejecutar método. No tiene los permisos");
+                    errores = true;
+                    System.out.println("Token: " + packServer.getToken());
+                    if (packServer.getToken().isEmpty()) {
+                        error = "No existe token para esta sesión";
+                    } else if (!servidor.estaConectado(packServer.getToken())) {
+                        error = "No hay token de sesión para este usuario";
+                    } else {
+                        error = "El token de sesión no coincide";
+                    }
+                }
+
+                // Añadir la securización de WHITE-LIST y BLACK-LIST
+                // Estas listas solo estaran disponible junto con la tokenización
+            }
+        }
+        if (!errores && metodo==null) {
+            errores = true;
+            error = "No hay método para ejecutar";
         }
         
         PaqueteCliente packCliente = new PaqueteCliente();

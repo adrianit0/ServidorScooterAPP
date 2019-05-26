@@ -58,7 +58,7 @@
         
         
         
-        <!-- Métodos para el CLiente -->
+        <!-- Métodos para el Cliente -->
         <mapping link="login" className="controller.UsuarioController" method="login" return="map" token="false">
             <params>
                 <param type="parameters" />
@@ -68,22 +68,6 @@
             <params>
                 <param type="parameters" />
             </params>
-        </mapping>
-        
-        
-        
-        <!-- Métodos para la administración -->
-        <mapping link="getEmpleados" className="controller.EmpleadoController" method="getEmpleados" return="map" token="true">
-            <white-list>
-                <role name="administrador" />
-                <role name="directivo" />
-            </white-list>
-        </mapping>
-        <mapping link="getClientes" className="controller.EmpleadoController" method="getClientes" return="map" token="true">
-            <white-list>
-                <role name="administrador" />
-                <role name="directivo" />
-            </white-list>
         </mapping>
         
         
@@ -101,10 +85,76 @@
             <white-list>
                 <role name="cliente" />
                 <role name="tecnico" />
+                <role name="administrador" />
+                <role name="directivo" />
             </white-list>
         </mapping>
         
         
+        <!-- Métodos para los bonos -->
+        <mapping link="getBonos" className="controller.BonoController" method="getBonos" return="map" token="true">
+            <white-list>
+                <role name="cliente" />
+                <role name="tecnico" />
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="aumentarBonos" className="controller.BonoController" method="aumentarBonos" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="cliente" />
+                <role name="tecnico" />
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        
+        
+        <!-- Métodos para la administración -->
+        <mapping link="getEmpleados" className="controller.EmpleadoController" method="getEmpleados" return="map" token="true">
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="getClientes" className="controller.EmpleadoController" method="getClientes" return="map" token="true">
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        
+        <!-- CRUD -->
+        <mapping link="createEmpleado" className="controller.CrudController" method="createEmpleado" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="updateEmpleado" className="controller.CrudController" method="createEmpleado" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="deleteEmpleado" className="controller.CrudController" method="createEmpleado" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
         
         
     </mappers>

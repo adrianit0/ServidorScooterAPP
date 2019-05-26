@@ -94,6 +94,9 @@ public class ScooterController extends GenericController {
             this.getHManager().updateObject(scooter);
         }
         
+        scooter.setBateria(bateria);
+        scooter.setEstaBloqueada(false);
+        
         ClienteInfo info = new ClienteInfo();
         info.setId(scooter.getId());
         info.setNombre(noSerie);
@@ -131,11 +134,13 @@ public class ScooterController extends GenericController {
         // FILTRAR
         List<Scooter> encontradas = new ArrayList<>();
         for (Scooter s : scooters) {
-            
+            if (s.isEstaBloqueada())
+                continue;
+            encontradas.add(s);
         }
         
-        Map<String,String> lista = util.Util.convertListToMap(scooters);
-        lista.put("length", scooters.size()+"");
+        Map<String,String> lista = util.Util.convertListToMap(encontradas);
+        lista.put("length", encontradas.size()+"");
         
         return lista;
     }

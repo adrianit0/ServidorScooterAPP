@@ -2,6 +2,7 @@ package entidades;
 // Generated 28-abr-2019 23:19:03 by Hibernate Tools 4.3.1
 
 
+import anotaciones.Ignore;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -23,7 +24,9 @@ public class Empleado  implements java.io.Serializable {
      private String email;
      private String pass;
      private double sueldo;
+     @Ignore
      private Set tareas = new HashSet(0);
+     @Ignore
      private Set horarios = new HashSet(0);
 
     public Empleado() {

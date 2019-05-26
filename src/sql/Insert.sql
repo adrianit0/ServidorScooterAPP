@@ -50,3 +50,9 @@ INSERT INTO empleado (nombre, apellido1, apellido2, dni, direccion, email, pass,
     ('Administrador', 'Admin', null, '12345678A', 'Foo Street', 'admin', '1234', 0, 1, 1, 1);
 
 INSERT INTO modelo (marca, modelo) VALUES ('Honda', 'PCX 108');
+
+INSERT INTO bono (nombre, descripcion, minutos, precio) VALUES
+('60 minutos', 'Te ahorras 1€', 60, 11),
+('100 minutos', 'Te ahorras 3€', 100, 17),
+('200 minutos', 'Te ahorras 10€', 200, 30),
+('400 minutos', 'Te ahorras 24€', 400, 56)
