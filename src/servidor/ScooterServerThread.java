@@ -59,6 +59,12 @@ public class ScooterServerThread extends Thread {
             
             try {
                 inputLine = in.readLine();
+                
+                // Si el mensaje viene del navegador devolvamos un mensaje de FORBIDDEN
+                /*if (inputLine.equals("GET / HTTP/1.1")) {
+                    out.println("403");
+                    continue;
+                }*/
 
                 outputLine = ejecutarMetodo (inputLine);
                 

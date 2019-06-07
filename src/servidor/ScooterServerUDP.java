@@ -8,7 +8,7 @@ package servidor;
 import configuration_server.ConfigurationMapper;
 import configuration_server.ConfigurationMethod;
 import configuration_server.ConfigurationSAXMapper;
-import excepciones.ExecuteError;
+import excepciones.ServerExecutionException;
 import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;

@@ -5,14 +5,8 @@
  */
 package principal;
 
-import configuration_server.ConfigurationMapper;
-import configuration_server.ConfigurationSAXMapper;
-import java.io.File;
 import java.io.IOException;
-import java.net.ServerSocket;
 import servidor.ScooterServerTCP;
-import servidor.ScooterServerThread;
-import servidor.ScooterServerUDP;
 
 /**
  *

@@ -8,7 +8,7 @@ package controller;
 import configuration_server.GenericController;
 import entidades.Cliente;
 import entidades.Empleado;
-import excepciones.ExecuteError;
+import excepciones.ServerExecutionException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,11 +20,11 @@ import util.Util;
  */
 public class EmpleadoController extends GenericController {
     
-    public Map<String, String> getEmpleados() throws ExecuteError {
+    public Map<String, String> getEmpleados() throws ServerExecutionException {
         List<Empleado> empleados = this.getHManager().getObjects("Empleado");
         
         if (empleados==null || empleados.isEmpty()) {
-            throw new ExecuteError ("No se ha encontrado ningún empleado", null);
+            throw new ServerExecutionException ("No se ha encontrado ningún empleado");
         }
         
         Map<String, String> result = new HashMap<>();
@@ -36,22 +36,22 @@ public class EmpleadoController extends GenericController {
         return result;
     }
     
-    public Map<String, String> getEmpleado(Map<String,String> parametros) throws ExecuteError {
+    public Map<String, String> getEmpleado(Map<String,String> parametros) throws ServerExecutionException {
         Integer id = Integer.parseInt(parametros.get("id"));
         Empleado empleado = (Empleado) this.getHManager().getObject(Empleado.class, id);
         
         if (empleado==null) 
-            throw new ExecuteError ("No se ha encontrado al empleado con ID " + id);
+            throw new ServerExecutionException ("No se ha encontrado al empleado con ID " + id);
         
         Map<String, String> result = util.Util.convertObjectToMap(empleado);
         return result;
     }
     
-    public Map<String, String> getClientes() throws ExecuteError {
+    public Map<String, String> getClientes() throws ServerExecutionException {
         List<Cliente> clientes = this.getHManager().getObjects("Cliente");
         
         if (clientes==null || clientes.isEmpty()) {
-            throw new ExecuteError ("No se ha encontrado ningún cliente", null);
+            throw new ServerExecutionException ("No se ha encontrado ningún cliente");
         }
         
         Map<String, String> result = new HashMap<>();

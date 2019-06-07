@@ -8,10 +8,13 @@ package servidor;
 import configuration_server.ConfigurationMapper;
 import configuration_server.ConfigurationMethod;
 import configuration_server.ConfigurationSAXMapper;
+import entidades.Alquiler;
+import entidades.Cliente;
 import entidades.Scooter;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,6 +22,8 @@ import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import servidor.ClienteInfo.Rol;
+import util.Constantes;
+import util.HibernateManager;
 import util.HibernateUtil;
 import util.Util;
 
@@ -35,6 +40,9 @@ public class ScooterServerTCP extends Thread{
     private ArrayList<Scooter> scooters;
     private LinkedHashMap<String, ClienteInfo> usuariosConectados; 
     private LinkedHashMap<Integer, Socket> socketsConectados;
+    private LinkedHashMap<String, Alquiler> alquileres;
+    
+    private HibernateManager hibernateManager;
     
     private Thread thisThread= null;
     private boolean listening;
@@ -50,6 +58,8 @@ public class ScooterServerTCP extends Thread{
         socketsConectados = new LinkedHashMap<>(32);
         usuariosConectados = new LinkedHashMap<>(32);
         scooters = new ArrayList<>();
+        
+        hibernateManager = new HibernateManager();
         
         if (instance==null)
             instance=this;
@@ -111,12 +121,107 @@ public class ScooterServerTCP extends Thread{
         stopServer ();
     }
     
-    public void addScooter (Scooter s) {
+    public synchronized void addScooter (Scooter s) {
         scooters.add(s);
     }
     
-    public List getScooters () {
+    public synchronized List getScooters () {
         return scooters;
+    }
+    
+    public synchronized Scooter getScooter (String serie) {
+        for (Scooter s : scooters) {
+            if (s.getNoSerie().equals(serie)) {
+                return s;
+            }
+        }
+        return null;
+    }
+    
+    public synchronized boolean reservarScooter (Scooter scooter) {
+        if (!scooters.contains(scooter) || scooter.isEstaBloqueada())
+            return false;
+        
+        scooter.setEstaBloqueada(false);
+        return true;
+    }
+    
+    public synchronized boolean cancelarReservaScooter (Scooter scooter) {
+        if (!scooters.contains(scooter) || !scooter.isEstaBloqueada())
+            return false;
+        
+        scooter.setEstaBloqueada(true);
+        return true;
+    }
+    
+    public synchronized boolean empezarAlquiler (String token, Scooter scooter) {
+        ClienteInfo info = getClient(token);
+        
+        if (info==null)
+            return false;
+        
+        if (scooter==null)
+            return false;
+        
+        Cliente cliente = (Cliente) hibernateManager.getObject(Cliente.class, (int) info.getId());
+        Date fechaInicio = new Date(System.currentTimeMillis());
+        
+        Alquiler alquiler = new Alquiler();
+        alquiler.setCliente(cliente);
+        alquiler.setScooter(scooter);
+        alquiler.setFechaInicio(fechaInicio);
+        alquiler.setCosteTotal(0); // EL coste inicial será de 0
+        
+        Integer id = hibernateManager.addObject(alquiler);
+        alquiler.setId(id);
+        
+        alquileres.put(token, alquiler);
+        
+        return true;
+    }
+    
+    public synchronized Alquiler terminarAlquiler (String token) {
+        Alquiler alquiler = alquileres.get(token);
+        if (alquiler==null)
+            return null;
+        
+        Date fechaInicio = alquiler.getFechaInicio();
+        Date fechaFin = new Date(System.currentTimeMillis());
+        
+        long diferencia = fechaFin.getTime() - fechaInicio.getTime();
+        
+        long segundos = diferencia/1000;
+        int minutos = Math.round(segundos/60);
+        
+        // Mínimo siempre se cobrará 1 minuto.
+        if (minutos==0)
+            minutos=1;
+        
+        // Volvemos a coger el cliente, por si tuviera una cantidad de minutos diferentes con las que empezó el alquiler.
+        Cliente cliente = (Cliente) hibernateManager.getObject(Cliente.class, alquiler.getCliente().getId());
+        
+        int minutosCliente = cliente.getMinutos();
+        
+        double costeMinuto = Constantes.precioBase;
+        double costeFinal = 0;
+        
+        if (minutos>minutosCliente) {
+            // Ha sobrepasado los minutos, por lo que el coste final no será gratis
+            cliente.setMinutos(0);
+            costeFinal = (minutos - minutosCliente) * costeMinuto;
+        } else {
+            // Se cobra los minutos y el viaje será gratis
+            cliente.setMinutos(minutosCliente-minutos);
+        }
+        
+        alquiler.setFechaFin(fechaFin);
+        alquiler.setMinutosConducidos(minutos);
+        alquiler.setCosteTotal(costeFinal);
+        
+        hibernateManager.updateObject(alquiler);
+        hibernateManager.updateObject(cliente);
+        
+        return alquiler;
     }
     
     public synchronized ConfigurationMethod getMethod (String uri) {

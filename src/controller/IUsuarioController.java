@@ -5,7 +5,7 @@
  */
 package controller;
 
-import excepciones.ExecuteError;
+import excepciones.ServerExecutionException;
 import java.util.Map;
 
 /**
@@ -15,7 +15,7 @@ import java.util.Map;
 public interface IUsuarioController {
     
     
-    public Map<String,String> login (Map<String, String> parameters) throws ExecuteError;
+    public Map<String,String> login (Map<String, String> parameters) throws ServerExecutionException;
     
-    public Map<String, String> register (Map<String, String> parameters) throws ExecuteError;
+    public Map<String, String> register (Map<String, String> parameters) throws ServerExecutionException;
 }

@@ -7,7 +7,7 @@ package controller;
 
 import configuration_server.GenericController;
 import entidades.Cliente;
-import excepciones.ExecuteError;
+import excepciones.ServerExecutionException;
 import excepciones.MapperException;
 import java.sql.Date;
 import java.util.HashMap;
@@ -28,7 +28,7 @@ public class UsuarioController extends GenericController implements IUsuarioCont
     
     
     @Override
-    public Map<String, String> login(Map<String, String> parameters) throws ExecuteError {
+    public Map<String, String> login(Map<String, String> parameters) throws ServerExecutionException {
         String nick = parameters.get("nick");
         String pass = parameters.get("pass");
         Integer idThread = Integer.parseInt(parameters.get("idThread"));
@@ -41,7 +41,7 @@ public class UsuarioController extends GenericController implements IUsuarioCont
         Cliente cliente = (Cliente) this.getHManager().getObjectCriterio("Cliente", criterios);
         
         if (cliente==null) {
-            throw new ExecuteError ("Nombre o contraseña erronea", null);
+            throw new ServerExecutionException ("Nombre o contraseña erronea");
         }
         
         Map<String, String> result = Util.convertObjectToMap(cliente);
@@ -63,7 +63,7 @@ public class UsuarioController extends GenericController implements IUsuarioCont
      * Registra a un usuario en la plataforma
      */
     @Override
-    public Map<String, String> register(Map<String, String> parameters) throws ExecuteError {
+    public Map<String, String> register(Map<String, String> parameters) throws ServerExecutionException {
         // Saber si el email está actualmente en uso
         String email = parameters.get("email");
         // COMPROBAR SI EL EMAIL ESTÁ BIEN FORMADO
@@ -71,7 +71,7 @@ public class UsuarioController extends GenericController implements IUsuarioCont
         criterios.put("email", email);
         Cliente cliente = (Cliente) this.getHManager().getObjectCriterio("Cliente", criterios);
         if (cliente!=null) {
-            throw new ExecuteError ("El email " + email+ " está actualmente en uso.", null);
+            throw new ServerExecutionException ("El email " + email+ " está actualmente en uso.");
         }
         
         // Saber si el nick del cliente ya existe
@@ -80,7 +80,7 @@ public class UsuarioController extends GenericController implements IUsuarioCont
         criterios.put("nick", nick);
         cliente = (Cliente) this.getHManager().getObjectCriterio("Cliente", criterios);
         if (cliente!=null) {
-            throw new ExecuteError ("El nombre " + nick+ " existe actualmente. Elije otro.", null);
+            throw new ServerExecutionException ("El nombre " + nick+ " existe actualmente. Elije otro.");
         }
         
         
@@ -101,7 +101,7 @@ public class UsuarioController extends GenericController implements IUsuarioCont
         Integer id = this.getHManager().addObject(nUsuario);
         
         if (id==null || id<=0) {
-            throw new ExecuteError("No se ha podido crear la cuenta. Intentelo de nuevo más tarde", null);
+            throw new ServerExecutionException("No se ha podido crear la cuenta. Intentelo de nuevo más tarde");
         }
         
         criterios.put("pass", pass);

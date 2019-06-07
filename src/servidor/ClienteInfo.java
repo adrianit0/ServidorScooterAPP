@@ -74,6 +74,4 @@ public class ClienteInfo {
     public void setIdThread(Integer idThread) {
         this.idThread = idThread;
     }
-    
-    
 }

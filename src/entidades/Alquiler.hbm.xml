@@ -7,7 +7,7 @@
             <column name="id" />
             <generator class="identity" />
         </id>
-        <many-to-one name="alquiler" class="entidades.Alquiler" fetch="select">
+        <many-to-one name="scooter" class="entidades.Scooter" fetch="select">
             <column name="scooter_id" not-null="true" />
         </many-to-one>
         <many-to-one name="cliente" class="entidades.Cliente" fetch="select">
@@ -28,23 +28,5 @@
         <property name="costeTotal" type="double">
             <column name="costeTotal" precision="6" not-null="true" />
         </property>
-        <set name="alquilers" table="alquiler" inverse="true" lazy="true" fetch="select">
-            <key>
-                <column name="scooter_id" not-null="true" />
-            </key>
-            <one-to-many class="entidades.Alquiler" />
-        </set>
-        <set name="estadoscooters" table="estadoscooter" inverse="true" lazy="true" fetch="select">
-            <key>
-                <column name="alquiler_id" not-null="true" />
-            </key>
-            <one-to-many class="entidades.Estadoscooter" />
-        </set>
-        <set name="incidencias" table="incidencia" inverse="true" lazy="true" fetch="select">
-            <key>
-                <column name="alquiler_id" />
-            </key>
-            <one-to-many class="entidades.Incidencia" />
-        </set>
     </class>
 </hibernate-mapping>

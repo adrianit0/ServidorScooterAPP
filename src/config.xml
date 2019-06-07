@@ -89,10 +89,53 @@
                 <role name="directivo" />
             </white-list>
         </mapping>
+        <mapping link="reservar" className="controller.ScooterController" method="reservarScooter" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="cliente" />
+            </white-list>
+        </mapping>
+        <mapping link="cancelarReserva" className="controller.ScooterController" method="cancelarReservaScooter" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="cliente" />
+            </white-list>
+        </mapping>
+        <mapping link="alquilar" className="controller.ScooterController" method="empezarAlquiler" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="cliente" />
+            </white-list>
+        </mapping>
+        <mapping link="finalizar" className="controller.ScooterController" method="finalizarAlquiler" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="cliente" />
+            </white-list>
+        </mapping>
         
         
         <!-- Métodos para los bonos -->
         <mapping link="getBonos" className="controller.BonoController" method="getBonos" return="map" token="true">
+            <white-list>
+                <role name="cliente" />
+                <role name="tecnico" />
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="getBono" className="controller.BonoController" method="getBono" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
             <white-list>
                 <role name="cliente" />
                 <role name="tecnico" />
@@ -107,6 +150,33 @@
             <white-list>
                 <role name="cliente" />
                 <role name="tecnico" />
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="createBono" className="controller.BonoController" method="createBono" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="updateBono" className="controller.BonoController" method="updateBono" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="deleteBono" className="controller.BonoController" method="deleteBono" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
                 <role name="administrador" />
                 <role name="directivo" />
             </white-list>
