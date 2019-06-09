@@ -6,8 +6,11 @@
 package controller;
 
 import configuration_server.GenericController;
+import entidades.Alquiler;
+import entidades.Cliente;
 import entidades.Modelo;
 import entidades.Scooter;
+import excepciones.AlquilerException;
 import excepciones.ServerExecutionException;
 import java.sql.Date;
 import java.util.ArrayList;
@@ -95,7 +98,7 @@ public class ScooterController extends GenericController {
         }
         
         scooter.setBateria(bateria);
-        scooter.setEstaBloqueada(false);
+        scooter.setBloqueada(false);
         
         ClienteInfo info = new ClienteInfo();
         info.setId(scooter.getId());
@@ -134,7 +137,7 @@ public class ScooterController extends GenericController {
         // FILTRAR
         List<Scooter> encontradas = new ArrayList<>();
         for (Scooter s : scooters) {
-            if (s.isEstaBloqueada())
+            if (s.isBloqueada())
                 continue;
             encontradas.add(s);
         }
@@ -147,19 +150,21 @@ public class ScooterController extends GenericController {
     
     public Map<String,String> reservarScooter (Map<String,String> parametros) throws ServerExecutionException {
         String noSerie = parametros.get("noSerie");
+        String token = parametros.get("token");
         
         Scooter scooter = this.getServer().getScooter(noSerie);
         
         if (scooter==null)
             throw new ServerExecutionException ("La scooter seleccionada no está disponible actualmente. Seleccione otra o intentelo más tarde.");
         
-        if (scooter.isEstaBloqueada()) 
+        if (scooter.isBloqueada()) 
             throw new ServerExecutionException ("La scooter seleccionada ha sido bloqueada por otro usuario. Seleccione otra");
         
-        boolean reservado = this.getServer().reservarScooter(scooter);
-        
-        if (!reservado)
-            throw new ServerExecutionException ("La scooter no se ha podido alquilar. Seleccione otra o intentelo más tarde.");
+        try {
+            this.getServer().reservarScooter(token, scooter);
+        } catch (AlquilerException e) {
+            throw new ServerExecutionException (e.getMessage());
+        }
         
         Map<String,String> resultado = new HashMap<>();
         resultado.put("status", "ok");
@@ -169,19 +174,21 @@ public class ScooterController extends GenericController {
     
     public Map<String,String> cancelarReservaScooter (Map<String,String> parametros) throws ServerExecutionException {
         String noSerie = parametros.get("noSerie");
+        String token = parametros.get("token");
         
         Scooter scooter = this.getServer().getScooter(noSerie);
         
         if (scooter==null)
             throw new ServerExecutionException ("La scooter reservada no está disponible actualmente.");
         
-        if (!scooter.isEstaBloqueada()) 
+        if (!scooter.isBloqueada()) 
             throw new ServerExecutionException ("La reserva ya estaba cancelada.");
         
-        boolean cancelado = this.getServer().cancelarReservaScooter(scooter);
-        
-        if (!cancelado)
-            throw new ServerExecutionException ("La scooter no se ha podido cancelar correctamente.");
+        try {
+            this.getServer().cancelarReservaScooter(token, scooter);
+        } catch (AlquilerException e) {
+            throw new ServerExecutionException (e.getMessage());
+        }
         
         Map<String,String> resultado = new HashMap<>();
         resultado.put("status", "ok");
@@ -207,13 +214,14 @@ public class ScooterController extends GenericController {
         if (scooter.getCodigo() != codigo)
             throw new ServerExecutionException ("El código no coincide, asegurate de seleccionar la Scooter correcta.");
         
-        if (!scooter.isEstaBloqueada()) 
+        if (!scooter.isBloqueada()) 
             throw new ServerExecutionException ("La reserva ha sido cancelada, vuelvelo a intentar");
         
-        boolean alquilado = getServer().empezarAlquiler(token, scooter);
-        
-        if (!alquilado)
-            throw new ServerExecutionException ("La scooter no se ha podido alquilar correctamente.");
+        try {
+            getServer().empezarAlquiler(token, scooter);
+        } catch (AlquilerException e) {
+            throw new ServerExecutionException (e.getMessage());
+        }
         
         Map<String,String> resultado = new HashMap<>();
         resultado.put("status", "ok");
@@ -222,7 +230,26 @@ public class ScooterController extends GenericController {
     }
     
     public Map<String,String> finalizarAlquiler (Map<String,String> parametros) throws ServerExecutionException {
-        return null;
+        String token = parametros.get("token");
+        
+        Alquiler alquiler;
+        try {
+            alquiler = getServer().terminarAlquiler(token);
+        } catch (AlquilerException e) {
+            throw new ServerExecutionException (e.getMessage());
+        }
+        
+        
+        if (alquiler==null)
+            throw new ServerExecutionException ("No existe alquiler para este usuario");
+        
+        Cliente cliente = alquiler.getCliente();
+        
+        Map<String,String> resultado = util.Util.convertObjectToMap(alquiler);
+        resultado.put("minutosRestante", cliente.getMinutos()+""); 
+        resultado.put("status", "ok");
+        
+        return resultado;
     }
     
 }

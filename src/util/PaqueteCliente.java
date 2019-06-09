@@ -15,48 +15,19 @@ import util.Util.CODIGO;
  * 
  * @author agarcia.gonzalez
  */
-public class PaqueteCliente implements IPaquete {
+public class PaqueteCliente {
     private CODIGO codigo;
     private String idPaquete;
     
     private Map<String,String> argumentos;
-    private Map<String,String> objetos;
 
-    public PaqueteCliente() {
-        this.objetos = new TreeMap<>();
-    }
+    public PaqueteCliente() { }
 
     public PaqueteCliente(CODIGO codigo, String idPaquete, Map<String, String> argumentos) {
         this.codigo = codigo;
         this.idPaquete = idPaquete;
         this.argumentos = argumentos;
-        this.objetos = new TreeMap<>();
     }
-    
-    public String addObjeto (String objeto) {
-        String nombre = "Objeto"+idPaquete+"#"+objetos.size();
-        objetos.put(nombre, objeto);
-        return nombre;
-    }
-    
-    public String getObjeto (String key) {
-        if (objetos.containsKey(key))
-            return objetos.get(key);
-        
-        return "null";
-    }
-
-    public Map<String, String> getObjetos() {
-        return objetos;
-    }
-
-    public void setObjetos(Map<String, String> objetos) {
-        this.objetos = objetos;
-    }
-    
-    
-    
-    
     
     public CODIGO getCodigo() {
         return codigo;
@@ -81,8 +52,4 @@ public class PaqueteCliente implements IPaquete {
     public void setArgumentos(Map<String, String> argumentos) {
         this.argumentos = argumentos;
     }
-
-    
-    
-    
 }

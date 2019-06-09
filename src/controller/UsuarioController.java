@@ -58,6 +58,20 @@ public class UsuarioController extends GenericController implements IUsuarioCont
         
         return result;
     }
+    
+    public Map<String, String> desconectar(Map<String, String> parameters) throws ServerExecutionException {
+        Integer idThread = Integer.parseInt(parameters.get("idThread"));
+        
+        boolean desconectado = this.getServer().desconectarUsuario(idThread);
+        
+        if (!desconectado)
+            throw new ServerExecutionException ("Error al intentar desconectar del servidor");
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("status", "ok");
+        
+        return result;
+    }
 
     /**
      * Registra a un usuario en la plataforma
@@ -107,6 +121,7 @@ public class UsuarioController extends GenericController implements IUsuarioCont
         criterios.put("pass", pass);
         
         // Por último nos logueamos
+        criterios.put("idThread", parameters.get("idThread"));
         Map<String,String> clienteInfo = login(criterios);
         
         return clienteInfo;

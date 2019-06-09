@@ -19,7 +19,7 @@ public class Scooter  implements java.io.Serializable {
      @Ignore
      private Modelo modelo;
      private String matricula;
-     private boolean estaBloqueada;
+     private boolean bloqueada;
      private int codigo;
      private Date fechaCompra;
      private double precioCompra;
@@ -64,12 +64,12 @@ public class Scooter  implements java.io.Serializable {
         this.bateria = bateria;
     }
 
-    public boolean isEstaBloqueada() {
-        return estaBloqueada;
+    public boolean isBloqueada() {
+        return bloqueada;
     }
 
-    public void setEstaBloqueada(boolean estaBloqueada) {
-        this.estaBloqueada = estaBloqueada;
+    public void setBloqueada(boolean bloqueada) {
+        this.bloqueada = bloqueada;
     }
 
     public String getNoSerie() {

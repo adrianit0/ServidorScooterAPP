@@ -10,7 +10,9 @@ import configuration_server.ConfigurationMethod;
 import configuration_server.ConfigurationSAXMapper;
 import entidades.Alquiler;
 import entidades.Cliente;
+import entidades.Estadoalquiler;
 import entidades.Scooter;
+import excepciones.AlquilerException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -58,6 +60,7 @@ public class ScooterServerTCP extends Thread{
         socketsConectados = new LinkedHashMap<>(32);
         usuariosConectados = new LinkedHashMap<>(32);
         scooters = new ArrayList<>();
+        alquileres = new LinkedHashMap<>(32);
         
         hibernateManager = new HibernateManager();
         
@@ -93,7 +96,6 @@ public class ScooterServerTCP extends Thread{
         } catch (ClassNotFoundException ex) {
             Logger.getLogger(ScooterServerTCP.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
         
         this.thisThread = getCurrentThread();
         
@@ -138,52 +140,141 @@ public class ScooterServerTCP extends Thread{
         return null;
     }
     
-    public synchronized boolean reservarScooter (Scooter scooter) {
-        if (!scooters.contains(scooter) || scooter.isEstaBloqueada())
-            return false;
-        
-        scooter.setEstaBloqueada(false);
-        return true;
-    }
-    
-    public synchronized boolean cancelarReservaScooter (Scooter scooter) {
-        if (!scooters.contains(scooter) || !scooter.isEstaBloqueada())
-            return false;
-        
-        scooter.setEstaBloqueada(true);
-        return true;
-    }
-    
-    public synchronized boolean empezarAlquiler (String token, Scooter scooter) {
+    public synchronized void reservarScooter (String token, Scooter scooter) throws AlquilerException {
         ClienteInfo info = getClient(token);
         
-        if (info==null)
-            return false;
+        if (info==null) {
+            System.err.println("ScooterServerTCP::reservarScooter error: token inexistente");
+            throw new AlquilerException ("El cliente no está conectado");
+        }
         
-        if (scooter==null)
-            return false;
+        if (!scooters.contains(scooter) || scooter.isBloqueada()) {
+            System.err.println("ScooterServerTCP::reservarScooter error: La scooter no se encuentra o ya está bloqueada");
+            throw new AlquilerException ("La scooter no se encuentra o ya ha sido bloqueada por otro usuario");
+        }
+        
+        Alquiler alquiler = alquileres.get(info.getNombre());
+        if (alquiler!=null) {
+            System.err.println("ScooterServerTCP::reservarScooter error: Ya tienes un alquiler");
+            throw new AlquilerException ("Ya tienes un alquiler");
+        }
+        
+        scooter.setBloqueada(true);
         
         Cliente cliente = (Cliente) hibernateManager.getObject(Cliente.class, (int) info.getId());
         Date fechaInicio = new Date(System.currentTimeMillis());
         
-        Alquiler alquiler = new Alquiler();
+        alquiler = new Alquiler();
         alquiler.setCliente(cliente);
         alquiler.setScooter(scooter);
+        alquiler.setEstadoalquiler(new Estadoalquiler(1));
         alquiler.setFechaInicio(fechaInicio);
         alquiler.setCosteTotal(0); // EL coste inicial será de 0
         
         Integer id = hibernateManager.addObject(alquiler);
         alquiler.setId(id);
         
-        alquileres.put(token, alquiler);
-        
-        return true;
+        alquileres.put(info.getNombre(), alquiler);
     }
     
-    public synchronized Alquiler terminarAlquiler (String token) {
-        Alquiler alquiler = alquileres.get(token);
-        if (alquiler==null)
-            return null;
+    public synchronized void cancelarReservaScooter (String token, Scooter scooter) throws AlquilerException {
+        ClienteInfo info = getClient(token);
+        if (info==null){
+            System.err.println("ScooterServerTCP::cancelarReservaScooter error: El cliente no está conectado");
+            throw new AlquilerException ("El cliente no está conectado");
+        }
+        
+        Alquiler alquiler = alquileres.get(info.getNombre());
+        if (alquiler==null) {
+            System.err.println("ScooterServerTCP::cancelarReservaScooter error: Alquiler no encontrado");
+            throw new AlquilerException ("Alquiler no encontrado");
+        }
+        
+        if (alquiler.getEstadoalquiler().getId()!=1) {
+            System.err.println("ScooterServerTCP::cancelarReservaScooter error: El estado del alquiler es incorrecto. " + alquiler.getEstadoalquiler().getId());
+            throw new AlquilerException ("El estado del alquiler es incorrecto. " + alquiler.getEstadoalquiler().getId());
+        }
+        
+        if (!scooters.contains(scooter) || !scooter.isBloqueada()) {
+            System.err.println("ScooterServerTCP::cancelarReservaScooter error: no hay scooters o no está bloqueada");
+            throw new AlquilerException ("No hay scooters o no está bloqueada");
+        }
+        
+        scooter.setBloqueada(false);
+        
+        Date fechaFin = new Date(System.currentTimeMillis());
+        
+        alquiler.setFechaFin(fechaFin);
+        alquiler.setEstadoalquiler(new Estadoalquiler(2));
+        
+        // Lo eliminamos de la lista de alquileres.
+        alquileres.remove(info.getNombre());
+        
+        boolean actualizado = hibernateManager.updateObject(alquiler);
+        if (!actualizado) {
+            System.err.println("ScooterServerTCP::cancelarReservaScooter error: no se ha actualizado el alquiler");
+            throw new AlquilerException ("No se ha podido actualizar el alquiler");
+        }
+        
+        
+    }
+    
+    public synchronized void empezarAlquiler (String token, Scooter scooter) throws AlquilerException {
+        ClienteInfo info = getClient(token);
+        
+        if (info==null) {
+            System.err.println("ScooterServerTCP::empezarAlquiler error: El cliente no está conectado");
+            throw new AlquilerException ("El cliente no está conectado");
+        }
+        
+        if (scooter==null){
+            System.err.println("ScooterServerTCP::empezarAlquiler error: No hay scooter para realizar el alquiler");
+            throw new AlquilerException ("No hay scooter para realizar el alquiler");
+        }
+        
+        Alquiler alquiler = alquileres.get(info.getNombre());
+        if (alquiler==null) {
+            System.err.println("ScooterServerTCP::empezarAlquiler error: Alquiler no encontrado");
+            throw new AlquilerException ("Alquiler no encontrado");
+        }
+        
+        if (alquiler.getEstadoalquiler().getId()!=1) {
+            System.err.println("ScooterServerTCP::empezarAlquiler error: El estado del alquiler es incorrecto. " + alquiler.getEstadoalquiler().getId());
+            throw new AlquilerException ("El estado del alquiler es incorrecto. " + alquiler.getEstadoalquiler().getId());
+        }
+        
+        Cliente cliente = (Cliente) hibernateManager.getObject(Cliente.class, (int) info.getId());
+        Date fechaInicio = new Date(System.currentTimeMillis());
+        
+        alquiler.setFechaInicio(fechaInicio); // Esta es la fecha inicio real del alquiler
+        alquiler.setEstadoalquiler(new Estadoalquiler(3));
+        
+        boolean actualizado = hibernateManager.updateObject(alquiler);
+        if (!actualizado) {
+            System.err.println("ScooterServerTCP::empezarAlquiler error: no se ha actualizado el alquiler");
+            throw new AlquilerException ("No se ha actualizado el alquiler");
+        }
+    }
+    
+    public synchronized Alquiler terminarAlquiler (String token) throws AlquilerException {
+        ClienteInfo info = getClient(token);
+        
+        if (info==null) {
+            System.err.println("ScooterServerTCP::terminarAlquiler error: El cliente no está conectado");
+            throw new AlquilerException ("El cliente no está conectado");
+        }
+        
+        Alquiler alquiler = alquileres.get(info.getNombre());
+        if (alquiler==null) {
+            System.err.println("ScooterServerTCP::terminarAlquiler error: No hay alquiler para este usuario");
+            throw new AlquilerException ("No hay alquiler para este usuario");
+        }
+        
+        if (alquiler.getEstadoalquiler().getId()!=3) {
+            System.err.println("ScooterServerTCP::terminarAlquiler error: El estado del alquiler es incorrecto. " + alquiler.getEstadoalquiler().getId());
+            throw new AlquilerException ("El estado del alquiler es incorrecto. " + alquiler.getEstadoalquiler().getId());
+        }
+            
         
         Date fechaInicio = alquiler.getFechaInicio();
         Date fechaFin = new Date(System.currentTimeMillis());
@@ -191,16 +282,14 @@ public class ScooterServerTCP extends Thread{
         long diferencia = fechaFin.getTime() - fechaInicio.getTime();
         
         long segundos = diferencia/1000;
-        int minutos = Math.round(segundos/60);
+        int minutos = (int) Math.ceil(segundos/60);
         
-        // Mínimo siempre se cobrará 1 minuto.
-        if (minutos==0)
-            minutos=1;
         
         // Volvemos a coger el cliente, por si tuviera una cantidad de minutos diferentes con las que empezó el alquiler.
         Cliente cliente = (Cliente) hibernateManager.getObject(Cliente.class, alquiler.getCliente().getId());
         
         int minutosCliente = cliente.getMinutos();
+        int minutosConsumidos;
         
         double costeMinuto = Constantes.precioBase;
         double costeFinal = 0;
@@ -208,18 +297,30 @@ public class ScooterServerTCP extends Thread{
         if (minutos>minutosCliente) {
             // Ha sobrepasado los minutos, por lo que el coste final no será gratis
             cliente.setMinutos(0);
+            minutosConsumidos = minutosCliente;
             costeFinal = (minutos - minutosCliente) * costeMinuto;
         } else {
-            // Se cobra los minutos y el viaje será gratis
+            // Se cobra los minutos y el viaje no tendrá coste añadido
             cliente.setMinutos(minutosCliente-minutos);
+            minutosConsumidos = minutos;
         }
+        
+        Scooter scooter = alquiler.getScooter();
+        scooter.setBloqueada(false); // Vuelve a estar disponible para alquilar
         
         alquiler.setFechaFin(fechaFin);
         alquiler.setMinutosConducidos(minutos);
         alquiler.setCosteTotal(costeFinal);
+        alquiler.setMinutosConsumidos(minutosConsumidos);
+        alquiler.setEstadoalquiler(new Estadoalquiler(4));
         
         hibernateManager.updateObject(alquiler);
         hibernateManager.updateObject(cliente);
+        
+        // Lo eliminamos de la lista de alquileres.
+        alquileres.remove(info.getNombre());
+        
+        alquiler.setCliente(cliente);
         
         return alquiler;
     }
@@ -277,10 +378,20 @@ public class ScooterServerTCP extends Thread{
 
         long tiempoActual = System.currentTimeMillis();
 
+        
+        boolean puedeCerrarSesion = true;
+        
+        // Alguna reglas por las que no se puede cerrar sesión
+        if (info.getRol() == Rol.SCOOTER)
+            puedeCerrarSesion=false;
+        else if (info.getRol() == Rol.CLIENTE && alquileres.get(info.getNombre())!=null)
+            puedeCerrarSesion=false;
+        
         // Si el usuario ha estado más de %outTime% sin hacer nada saldrá del servidor
         // Eliminamos el token ya que sabemos que no lo volveremos a utilizar
         // Las Scooters no tendran tiempo de TimeOut
-        if (info.getRol() != Rol.SCOOTER && tiempoActual - info.getTimeSinceLastAction() > outTime) {
+        // Tampoco los usuarios que esté en alquiler
+        if (puedeCerrarSesion && tiempoActual - info.getTimeSinceLastAction() > outTime) {
             usuariosConectados.remove(token);
             return false;
         }

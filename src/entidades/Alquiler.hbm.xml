@@ -13,17 +13,17 @@
         <many-to-one name="cliente" class="entidades.Cliente" fetch="select">
             <column name="cliente_id" not-null="true" />
         </many-to-one>
+        <many-to-one name="estadoalquiler" class="entidades.Estadoalquiler" fetch="select">
+            <column name="estado_id" not-null="true" />
+        </many-to-one>
         <property name="fechaInicio" type="timestamp">
             <column name="fechaInicio" length="19" not-null="true" />
         </property>
         <property name="fechaFin" type="timestamp">
-            <column name="fechaFin" length="19" not-null="true" />
+            <column name="fechaFin" length="19" />
         </property>
         <property name="minutosConducidos" type="java.lang.Integer">
             <column name="minutosConducidos" />
-        </property>
-        <property name="minutosParada" type="java.lang.Integer">
-            <column name="minutosParada" />
         </property>
         <property name="costeTotal" type="double">
             <column name="costeTotal" precision="6" not-null="true" />

@@ -204,7 +204,7 @@ public class Util {
      */
     public static PaqueteCliente unpackToCliente (String cadena) {
         PaqueteCliente pack = new PaqueteCliente();
-        cadena = convertirObjetos(cadena, pack);
+        //cadena = convertirObjetos(cadena, pack);
         String[] decoded = decode(cadena);
         
         if (decoded==null || decoded.length<3) {
@@ -260,16 +260,6 @@ public class Util {
         }
         
         String encoded = encode (paquete.getCodigo(), parametros);
-        System.out.println("Cantidad argumentos: " + paquete.getObjetos().size());
-        
-        for (Map.Entry<String, String> entry : paquete.getObjetos().entrySet()) {
-            String key = entry.getKey();
-            String value = entry.getValue();
-            
-            System.out.println("KEY: " + key+ " VALUE:" + value);
-            
-            encoded = encoded.replace (key, value);
-        }
         
         return encoded;
     }

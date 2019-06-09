@@ -43,6 +43,9 @@ public class ClienteInfo {
         this.id = id;
     }
 
+    /**
+     * Obtiene el nickname del usuario
+     */
     public String getNombre() {
         return nombre;
     }

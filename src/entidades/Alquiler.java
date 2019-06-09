@@ -1,29 +1,46 @@
 package entidades;
 
+import anotaciones.Ignore;
 import java.sql.Date;
 
 public class Alquiler  implements java.io.Serializable {
 
 
-     private Integer id;
-     private Scooter scooter;
-     private Cliente cliente;
-     private Date fechaInicio;
-     private Date fechaFin;
-     private Integer minutosConducidos;
-     private Integer minutosParada;
-     private double costeTotal;
+    private Integer id;
+    private Integer minutosConducidos;
+    private double costeTotal;
+    private Integer minutosConsumidos;
+    
+    @Ignore
+    private Date fechaInicio;
+    @Ignore
+    private Date fechaFin;
+    @Ignore
+    private Scooter scooter;
+    @Ignore
+    private Cliente cliente;
+    @Ignore
+    private Estadoalquiler estadoalquiler;
 
     public Alquiler() {}
 	
-    public Alquiler(Scooter scooter, Cliente cliente, Date fechaInicio, Date fechaFin, double costeTotal) {
+    public Alquiler(Scooter scooter, Cliente cliente, Estadoalquiler estadoalquiler, Date fechaInicio, Date fechaFin, double costeTotal) {
         this.scooter = scooter;
         this.cliente = cliente;
         this.fechaInicio = fechaInicio;
         this.fechaFin = fechaFin;
         this.costeTotal = costeTotal;
+        this.estadoalquiler = estadoalquiler;
     }
-   
+
+    public Estadoalquiler getEstadoalquiler() {
+        return estadoalquiler;
+    }
+
+    public void setEstadoalquiler(Estadoalquiler estadoalquiler) {
+        this.estadoalquiler = estadoalquiler;
+    }
+    
     public Integer getId() {
         return this.id;
     }
@@ -68,13 +85,6 @@ public class Alquiler  implements java.io.Serializable {
     public void setMinutosConducidos(Integer minutosConducidos) {
         this.minutosConducidos = minutosConducidos;
     }
-    public Integer getMinutosParada() {
-        return this.minutosParada;
-    }
-    
-    public void setMinutosParada(Integer minutosParada) {
-        this.minutosParada = minutosParada;
-    }
     public double getCosteTotal() {
         return this.costeTotal;
     }
@@ -82,4 +92,14 @@ public class Alquiler  implements java.io.Serializable {
     public void setCosteTotal(double costeTotal) {
         this.costeTotal = costeTotal;
     }
+
+    public Integer getMinutosConsumidos() {
+        return minutosConsumidos;
+    }
+
+    public void setMinutosConsumidos(Integer minutosConsumidos) {
+        this.minutosConsumidos = minutosConsumidos;
+    }
+    
+    
 }

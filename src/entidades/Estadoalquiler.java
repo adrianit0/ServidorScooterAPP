@@ -15,6 +15,10 @@ public class Estadoalquiler  implements java.io.Serializable {
     public Estadoalquiler() {
     }
 
+    public Estadoalquiler (Integer id) {
+        this.id=id;
+    }
+    
     public Estadoalquiler(String nombre) {
        this.nombre = nombre;
     }

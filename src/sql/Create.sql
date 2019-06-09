@@ -63,13 +63,14 @@ CREATE TABLE IF NOT EXISTS Alquiler (
     fechaInicio TIMESTAMP,
     fechaFin TIMESTAMP,
     minutosConducidos INT,
-    minutosParada INT,
     costeTotal DOUBLE(6,2) NOT NULL DEFAULT 0,
     -- Foreign keys
     cliente_id INT NOT NULL,
     scooter_id INT NOT NULL,
+    estado_id INT NOT NULL,
     CONSTRAINT clalfk FOREIGN KEY (cliente_id) REFERENCES Cliente(id),
-    CONSTRAINT clscfk FOREIGN KEY (scooter_id) REFERENCES Scooter(id)
+    CONSTRAINT clscfk FOREIGN KEY (scooter_id) REFERENCES Scooter(id),
+    CONSTRAINT clesfk FOREIGN KEY (estado_id) REFERENCES EstadoAlquiler (id)
 ) ENGINE=INNODB;
 
 CREATE TABLE IF NOT EXISTS EstadoScooter (

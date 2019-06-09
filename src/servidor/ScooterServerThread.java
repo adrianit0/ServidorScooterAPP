@@ -96,15 +96,19 @@ public class ScooterServerThread extends Thread {
      * bytes
      */
     private String ejecutarMetodo(String contenido) {
+        if (contenido==null || contenido.isEmpty()) {
+            System.err.println("ScooterserverThread::ejecutarMetodo error: Se ha detectado una trama vacía.");
+            listening = false;
+            return "0;3;error:Trama vacía";
+        }
+        
         String error = "Undefined";
         boolean errores = false;
-        if (contenido==null || contenido.isEmpty()) {
-            error = "Trama vacía";
-            errores = true;
-        }
         PaqueteServidor packServer = Util.unpackToServer(contenido);
-        if (packServer==null)
-            packServer= new PaqueteServidor();
+        if (packServer==null) {
+            System.err.println("ScooterServerThread::ejecutarMetodo error: Mensaje no creado correctamente.");
+            //listening=false;
+        }
         
         ConfigurationMethod metodo = null;
         
@@ -150,6 +154,7 @@ public class ScooterServerThread extends Thread {
         if (!errores) {
             // Incluimos el idthread, necesario para acceder a este Thread desde el controlador
             packServer.getArgumentos().put("idThread", idThread+"");
+            packServer.getArgumentos().put("token", packServer.getToken());
             Map<String, String> result = (Map<String, String>) metodo.invoke(packServer.getArgumentos());
 
             if (result==null) {
