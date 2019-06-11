@@ -2,6 +2,7 @@ package entidades;
 
 import anotaciones.Ignore;
 import java.sql.Date;
+import java.sql.Timestamp;
 
 public class Alquiler  implements java.io.Serializable {
 
@@ -12,9 +13,9 @@ public class Alquiler  implements java.io.Serializable {
     private Integer minutosConsumidos;
     
     @Ignore
-    private Date fechaInicio;
+    private Timestamp fechaInicio;
     @Ignore
-    private Date fechaFin;
+    private Timestamp fechaFin;
     @Ignore
     private Scooter scooter;
     @Ignore
@@ -24,7 +25,7 @@ public class Alquiler  implements java.io.Serializable {
 
     public Alquiler() {}
 	
-    public Alquiler(Scooter scooter, Cliente cliente, Estadoalquiler estadoalquiler, Date fechaInicio, Date fechaFin, double costeTotal) {
+    public Alquiler(Scooter scooter, Cliente cliente, Estadoalquiler estadoalquiler, Timestamp fechaInicio, Timestamp fechaFin, double costeTotal) {
         this.scooter = scooter;
         this.cliente = cliente;
         this.fechaInicio = fechaInicio;
@@ -64,18 +65,19 @@ public class Alquiler  implements java.io.Serializable {
     public void setCliente(Cliente cliente) {
         this.cliente = cliente;
     }
-    public Date getFechaInicio() {
-        return this.fechaInicio;
+
+    public Timestamp getFechaInicio() {
+        return fechaInicio;
     }
-    
-    public void setFechaInicio(Date fechaInicio) {
+
+    public void setFechaInicio(Timestamp fechaInicio) {
         this.fechaInicio = fechaInicio;
     }
-    public Date getFechaFin() {
+    public Timestamp getFechaFin() {
         return this.fechaFin;
     }
     
-    public void setFechaFin(Date fechaFin) {
+    public void setFechaFin(Timestamp fechaFin) {
         this.fechaFin = fechaFin;
     }
     public Integer getMinutosConducidos() {

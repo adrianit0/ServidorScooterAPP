@@ -29,13 +29,14 @@ public class ConfigurationMethod {
     
     private boolean token;
     
-    private ArrayList<RoleEstado> whiteList;
-    private ArrayList<RoleEstado> blackList;
+    private ArrayList<Rol> whiteList;
+    private ArrayList<Rol> blackList;
 
     public ConfigurationMethod() {
+        
     }
 
-    public ConfigurationMethod(String uri, Object instance, Method metodo, ArrayList<Class> params, String returnParam, boolean token, ArrayList<RoleEstado> whiteList, ArrayList<RoleEstado> blackList) {
+    public ConfigurationMethod(String uri, Object instance, Method metodo, ArrayList<Class> params, String returnParam, boolean token, ArrayList<Rol> whiteList, ArrayList<Rol> blackList) {
         this.uri = uri;
         this.instance = instance;
         this.metodo = metodo;
@@ -126,19 +127,19 @@ public class ConfigurationMethod {
         this.token = token;
     }
 
-    public ArrayList<RoleEstado> getWhiteList() {
+    public ArrayList<Rol> getWhiteList() {
         return whiteList;
     }
 
-    public void setWhiteList(ArrayList<RoleEstado> whiteList) {
+    public void setWhiteList(ArrayList<Rol> whiteList) {
         this.whiteList = whiteList;
     }
 
-    public ArrayList<RoleEstado> getBlackList() {
+    public ArrayList<Rol> getBlackList() {
         return blackList;
     }
 
-    public void setBlackList(ArrayList<RoleEstado> blackList) {
+    public void setBlackList(ArrayList<Rol> blackList) {
         this.blackList = blackList;
     }
     

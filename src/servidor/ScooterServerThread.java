@@ -6,6 +6,7 @@
 package servidor;
 
 import configuration_server.ConfigurationMethod;
+import configuration_server.Rol;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -136,10 +137,18 @@ public class ScooterServerThread extends Thread {
                     } else {
                         error = "El token de sesión no coincide";
                     }
-                }
+                } else {
+                    // Securización de WHITE-LIST y BLACK-LIST
+                    // Estas listas solo estaran disponible junto si primero ha sido tokenizado
+                    Rol rol = servidor.getRoleUsuario(packServer.getToken());
+                    boolean estaEnWhiteList = metodo.getWhiteList()==null || metodo.getWhiteList().contains(rol);
+                    boolean estaEnBlackList = metodo.getBlackList()!=null && metodo.getBlackList().contains(rol);
 
-                // Añadir la securización de WHITE-LIST y BLACK-LIST
-                // Estas listas solo estaran disponible junto con la tokenización
+                    if (!estaEnWhiteList||estaEnBlackList) {
+                        errores = true;
+                        error="No tienes permiso para ejecutar esta petición. " + rol.toString();
+                    }
+                }
             }
         }
         if (!errores && metodo==null) {

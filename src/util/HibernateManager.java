@@ -22,7 +22,7 @@ import org.hibernate.Transaction;
  */
 public class HibernateManager {
 
-    public List getObjectsCriterio(String tabla, Map<String, String> criterios) {
+    private List getObjectsCriterio(String tabla, Map<String, String> criterios, String condicional) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction tx = null;
 
@@ -41,12 +41,13 @@ public class HibernateManager {
             actual++;
 
             if (actual != size) {
-                condicion += " AND ";
+                condicion += " "+condicional+" ";
             }
         }
 
         try {
             tx = session.beginTransaction();
+            System.out.println("FROM " + tabla + condicion);
             objetos = session.createQuery("FROM " + tabla + condicion).list();
             tx.commit();
         } catch (HibernateException e) {
@@ -59,6 +60,14 @@ public class HibernateManager {
         }
 
         return objetos;
+    }
+    
+    public List getObjectsCriterio(String tabla, Map<String, String> criterios) {
+        return getObjectsCriterio (tabla, criterios, "AND");
+    }
+    
+    public List getObjectsCriterioOR (String tabla, Map<String,String> criterios) {
+        return getObjectsCriterio (tabla, criterios, "OR");
     }
 
     public Object getObjectCriterio(String tabla, Map<String, String> criterios) {
@@ -104,6 +113,10 @@ public class HibernateManager {
     }
 
     public List getObjects(String tabla) {
+        return getObjects(tabla, "");
+    }
+    
+    public List getObjects (String tabla, String consulta) {
         Session session = HibernateUtil.getSessionFactory().openSession();
         Transaction tx = null;
 
@@ -111,7 +124,7 @@ public class HibernateManager {
 
         try {
             tx = session.beginTransaction();
-            objetos = session.createQuery("FROM " + tabla).list();
+            objetos = session.createQuery("FROM " + tabla + " " + consulta).list();
             tx.commit();
         } catch (HibernateException e) {
             if (tx != null) {

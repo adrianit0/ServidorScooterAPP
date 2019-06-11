@@ -89,6 +89,17 @@
                 <role name="directivo" />
             </white-list>
         </mapping>
+        <mapping link="getScooterById" className="controller.ScooterController" method="getScooterById" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="cliente" />
+                <role name="tecnico" />
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
         <mapping link="reservar" className="controller.ScooterController" method="reservarScooter" return="map" token="true">
             <params>
                 <param type="parameters" />

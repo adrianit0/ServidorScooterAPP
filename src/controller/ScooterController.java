@@ -6,6 +6,7 @@
 package controller;
 
 import configuration_server.GenericController;
+import configuration_server.Rol;
 import entidades.Alquiler;
 import entidades.Cliente;
 import entidades.Modelo;
@@ -103,7 +104,7 @@ public class ScooterController extends GenericController {
         ClienteInfo info = new ClienteInfo();
         info.setId(scooter.getId());
         info.setNombre(noSerie);
-        info.setRol(ClienteInfo.Rol.SCOOTER);
+        info.setRol(Rol.SCOOTER);
         info.setIdThread(idThread);
         String token = this.getServer().conectarUsuario(info);
         
@@ -146,6 +147,15 @@ public class ScooterController extends GenericController {
         lista.put("length", encontradas.size()+"");
         
         return lista;
+    }
+    
+    public Map<String,String> getScooterById (Map<String,String> parametros ) throws ServerExecutionException {
+        int id = Integer.parseInt(parametros.get("id"));
+        Scooter scooter = (Scooter) this.getHManager().getObject(Scooter.class, id);
+        if (scooter==null)
+            throw new ServerExecutionException("No se ha encontrado la Scooter con ID " + id);
+        Map<String,String> resultado = util.Util.convertObjectToMap(scooter);
+        return resultado;
     }
     
     public Map<String,String> reservarScooter (Map<String,String> parametros) throws ServerExecutionException {

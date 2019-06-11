@@ -6,6 +6,8 @@
 package controller;
 
 import configuration_server.GenericController;
+import configuration_server.Rol;
+import entidades.Alquiler;
 import entidades.Cliente;
 import excepciones.ServerExecutionException;
 import excepciones.MapperException;
@@ -50,11 +52,25 @@ public class UsuarioController extends GenericController implements IUsuarioCont
         ClienteInfo info = new ClienteInfo ();
         info.setNombre(cliente.getNick());
         info.setId(cliente.getId());
-        info.setRol(ClienteInfo.Rol.CLIENTE);
+        info.setRol(Rol.CLIENTE);
         info.setIdThread(idThread);
         
         String token = this.getServer().conectarUsuario(info);
         result.put("token", token);
+        
+        Alquiler alquiler = this.getServer().getAlquiler(nick);
+        
+        if (alquiler!=null) {
+            // Si el valor es 1 significa que está reservando, si el valor es 2 el valor es 
+            result.put("state", alquiler.getEstadoalquiler().getId()==2 ? "1" : "2");
+            // Coges el tiempo que llevabas
+            result.put("time", alquiler.getFechaInicio().getTime()+"");
+            // Coges el noSerie de la scooter de la moto alquilada
+            result.put("scooterID", alquiler.getScooter().getId()+"");
+        } else {
+            // Estado normal
+            result.put("state", "0");
+        }
         
         return result;
     }

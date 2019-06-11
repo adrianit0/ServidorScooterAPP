@@ -5,6 +5,8 @@
  */
 package servidor;
 
+import configuration_server.Rol;
+
 /**
  *
  * Contiene la información del cliente que tiene a partir de su token.
@@ -12,9 +14,6 @@ package servidor;
  * @author Adrián García
  */
 public class ClienteInfo {
-    public enum Rol {
-        CLIENTE, ADMINISTRADOR, TECNICO, SCOOTER
-    };
     private long id;
     private String nombre;
     private long timeSinceLastAction;   // Tiempo que ha pasado desde la última acción.

@@ -8,6 +8,7 @@ package servidor;
 import configuration_server.ConfigurationMapper;
 import configuration_server.ConfigurationMethod;
 import configuration_server.ConfigurationSAXMapper;
+import configuration_server.Rol;
 import entidades.Alquiler;
 import entidades.Cliente;
 import entidades.Estadoalquiler;
@@ -17,13 +18,14 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import servidor.ClienteInfo.Rol;
 import util.Constantes;
 import util.HibernateManager;
 import util.HibernateUtil;
@@ -46,7 +48,6 @@ public class ScooterServerTCP extends Thread{
     
     private HibernateManager hibernateManager;
     
-    private Thread thisThread= null;
     private boolean listening;
     
     // Constantes
@@ -97,10 +98,19 @@ public class ScooterServerTCP extends Thread{
             Logger.getLogger(ScooterServerTCP.class.getName()).log(Level.SEVERE, null, ex);
         }
         
-        this.thisThread = getCurrentThread();
-        
         System.out.println("Inicializando Servidor");
         opnServerSocket();
+        
+        System.out.println("Tomando los alquileres que siguen en curso");
+        List<Alquiler> alquileres = this.hibernateManager.getObjects("Alquiler as a", "WHERE a.estadoalquiler.id=3");
+        if (alquileres.size()>0) {
+            // Se cancelaran los alquileres actualmente a medias, aunque habría que poner los criterios por los que continuar algunos alquileres.
+            System.out.println(alquileres.size() + " encontrados sin finalizar. Se procederá a cancelarlos");
+            for (Alquiler a : alquileres) {
+                a.setEstadoalquiler(new Estadoalquiler(5));
+                hibernateManager.updateObject(a);
+            }
+        }
         
         System.out.println("Servidor inicializado. Ya puede recibir usuarios.");
         while(isOpen()){
@@ -118,7 +128,7 @@ public class ScooterServerTCP extends Thread{
             socketsConectados.put(idThread, clientSocket);
             new ScooterServerThread(clientSocket, idThread, this).start();
         }
-        System.out.println("Server has Stopped...Please check") ;
+        System.out.println("Servidor apagando...") ;
         
         stopServer ();
     }
@@ -162,7 +172,7 @@ public class ScooterServerTCP extends Thread{
         scooter.setBloqueada(true);
         
         Cliente cliente = (Cliente) hibernateManager.getObject(Cliente.class, (int) info.getId());
-        Date fechaInicio = new Date(System.currentTimeMillis());
+        Timestamp fechaInicio = new Timestamp(System.currentTimeMillis());
         
         alquiler = new Alquiler();
         alquiler.setCliente(cliente);
@@ -202,7 +212,7 @@ public class ScooterServerTCP extends Thread{
         
         scooter.setBloqueada(false);
         
-        Date fechaFin = new Date(System.currentTimeMillis());
+        Timestamp fechaFin = new Timestamp(System.currentTimeMillis());
         
         alquiler.setFechaFin(fechaFin);
         alquiler.setEstadoalquiler(new Estadoalquiler(2));
@@ -244,7 +254,7 @@ public class ScooterServerTCP extends Thread{
         }
         
         Cliente cliente = (Cliente) hibernateManager.getObject(Cliente.class, (int) info.getId());
-        Date fechaInicio = new Date(System.currentTimeMillis());
+        Timestamp fechaInicio = new Timestamp(System.currentTimeMillis());
         
         alquiler.setFechaInicio(fechaInicio); // Esta es la fecha inicio real del alquiler
         alquiler.setEstadoalquiler(new Estadoalquiler(3));
@@ -276,8 +286,8 @@ public class ScooterServerTCP extends Thread{
         }
             
         
-        Date fechaInicio = alquiler.getFechaInicio();
-        Date fechaFin = new Date(System.currentTimeMillis());
+        Timestamp fechaInicio = alquiler.getFechaInicio();
+        Timestamp fechaFin = new Timestamp(System.currentTimeMillis());
         
         long diferencia = fechaFin.getTime() - fechaInicio.getTime();
         
@@ -325,6 +335,10 @@ public class ScooterServerTCP extends Thread{
         return alquiler;
     }
     
+    public Alquiler getAlquiler (String nick) {
+        return alquileres.get(nick);
+    }
+    
     public synchronized ConfigurationMethod getMethod (String uri) {
         return mapper.getMethod(uri);
     }
@@ -354,7 +368,14 @@ public class ScooterServerTCP extends Thread{
             this.listening = false;
             throw new RuntimeException("No se puede abrir el puerto "+port, e);
         }
+    }
+    
+    public synchronized Rol getRoleUsuario (String token) {
+        ClienteInfo info = getClient(token);
+        if (info==null)
+            return null;
         
+        return info.getRol();
     }
     
     public synchronized boolean puedeRealizarAccion(String token, String usuario) {

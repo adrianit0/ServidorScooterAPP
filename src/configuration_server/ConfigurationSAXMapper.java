@@ -75,6 +75,7 @@ class ConfigurationHandler extends DefaultHandler {
     
     private ArrayList<Class> tempParams;
     private Map<String, Object> objetosInstanciados;
+    private ArrayList<Rol> roleList;
     
     private StringBuilder buffer;
 
@@ -183,12 +184,24 @@ class ConfigurationHandler extends DefaultHandler {
                 }
                 break;
             case "params":
-                
                 break;
             case "param":
                 Class clase = getParamType (attributes.getValue("type"));
                 if (clase!=null)
                     tempParams.add(clase);
+                break;
+                
+            case "white-list":
+            case "black-list":
+                roleList = new ArrayList<>();
+                break;
+                
+            case "role":
+                String textoRol = attributes.getValue("name");
+                for (Rol rol : Rol.values()) {
+                    if (rol.esRole(textoRol))
+                        roleList.add(rol);
+                }
                 break;
             
             // Contenido en el que tiene que leer cosas dentro de las etiquetas
@@ -215,9 +228,15 @@ class ConfigurationHandler extends DefaultHandler {
                     System.err.println("Error de creación del método: " + ex);
                 }
                 
-                System.out.println("Metodos: " + tempMethod.getMetodo());
+                roleList=null;
                 mapper.addMethod(tempMethod);
                 System.out.println("Método " + tempMethod.getMetodo().getName() + " del singleton " + clase.getName() + " se ha añadido correctamente a la coleción");
+                break;
+            case "white-list":
+                tempMethod.setWhiteList(roleList);
+                break;
+            case "black-list":
+                tempMethod.setBlackList(roleList);
                 break;
             case "params":
                 if (clase==null)
