@@ -46,8 +46,8 @@ INSERT INTO sede (nombre, direccion, ciudad_id) VALUES
     ('ScooterAPP principal', 'Calle Sacramento', (SELECT id FROM ciudad WHERE nombre='Cádiz' LIMIT 1)),
     ('ScooterAPP filial', 'Calle Investigación', (SELECT id FROM ciudad WHERE nombre LIKE '%Jerez%' LIMIT 1));
 
-INSERT INTO empleado (nombre, apellido1, apellido2, dni, direccion, email, pass, sueldo, puesto_id, ciudad_id, sede_id) VALUES
-    ('Administrador', 'Admin', null, '12345678A', 'Foo Street', 'admin', '1234', 0, 1, 1, 1);
+INSERT INTO empleado (nombre, apellido1, apellido2, dni, direccion, email, pass, sueldo, puesto_id, ciudad_id, sede_id, fecha_alta, fecha_baja) VALUES
+    ('Administrador', 'Admin', null, '12345678A', 'Foo Street', 'admin', '1234', 0, 1, 1, 1, now(), null);
 
 INSERT INTO modelo (marca, modelo) VALUES ('Honda', 'PCX 108');
 

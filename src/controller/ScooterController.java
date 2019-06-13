@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import servidor.ClienteInfo;
+import util.HibernateManager;
 
 /**
  *
@@ -154,8 +155,33 @@ public class ScooterController extends GenericController {
         Scooter scooter = (Scooter) this.getHManager().getObject(Scooter.class, id);
         if (scooter==null)
             throw new ServerExecutionException("No se ha encontrado la Scooter con ID " + id);
+        scooter = getServer().getScooter(scooter.getNoSerie());
         Map<String,String> resultado = util.Util.convertObjectToMap(scooter);
         return resultado;
+    }
+    
+    public Map<String, String> getScootersBBDD() throws ServerExecutionException {
+        List<Scooter> scooters = this.getHManager().getObjects("Scooter");
+        
+        if (scooters==null || scooters.isEmpty()) {
+            throw new ServerExecutionException ("No se ha encontrado ninguna scooter");
+        }
+        
+        Map<String, String> result = util.Util.convertListToMap(scooters);
+        return result;
+    }
+    
+    public Map<String, String> getScooterBBDD (Map<String,String> parametros) throws ServerExecutionException {
+        Integer id = Integer.parseInt(parametros.get("id"));
+        
+        Scooter scooter = (Scooter) this.getHManager().getObjectWithoutLazyObjects(Scooter.class, id, "getModelo");
+        
+        if (scooter==null) 
+            throw new ServerExecutionException ("No se ha encontrado a la scooter con ID " + id);
+        
+        Map<String, String> result = util.Util.convertObjectToMap(scooter);
+        result.put("modelo", scooter.getModelo().getId()+"");
+        return result;
     }
     
     public Map<String,String> reservarScooter (Map<String,String> parametros) throws ServerExecutionException {
@@ -260,6 +286,55 @@ public class ScooterController extends GenericController {
         resultado.put("status", "ok");
         
         return resultado;
+    }
+    
+    public Map<String,String> updateScooter (Map<String,String> parametros) throws ServerExecutionException {
+        Scooter scooter = (Scooter) util.Util.convertMapToObject(Scooter.class, parametros);
+        
+        if (scooter.getMatricula().length()>7) {
+            throw new ServerExecutionException ("La longitud de la matricula es demasiado grande");
+        }
+        
+        HibernateManager hm = this.getHManager();
+        Scooter lastScooter = (Scooter) hm.getObjectWithoutLazyObjects(Scooter.class, scooter.getId(), "getModelo");
+        
+        Integer modeloId = util.Util.parseInt(parametros.get("modeloId"));
+        
+        scooter.setModelo(modeloId!=null? new Modelo(modeloId) : lastScooter.getModelo());
+        scooter.setFechaCompra(lastScooter.getFechaCompra());
+        scooter.setPosicionLat(lastScooter.getPosicionLat());
+        scooter.setPosicionLon(lastScooter.getPosicionLon());
+        
+        if (parametros.get("precioCompra")==null)
+            scooter.setPrecioCompra(lastScooter.getPrecioCompra());
+        
+        Boolean editado = hm.updateObject(scooter);
+        
+        if (!editado)
+            throw new ServerExecutionException ("No se ha podido editar la scooter", parametros);
+        
+        Map<String,String> result = util.Util.convertObjectToMap(scooter);
+        return result;
+    }
+    
+    public Map<String,String> deleteScooter (Map<String,String> parametros) throws ServerExecutionException {
+        Integer id = Integer.parseInt(parametros.get("id"));
+        
+        HibernateManager hm = this.getHManager();
+        
+        Scooter scooter = (Scooter) hm.getObject(Scooter.class, id);
+        Boolean editado = false;
+        try {
+            editado = hm.deleteObject(scooter);
+        } catch (Exception e) {
+            throw new ServerExecutionException ("No se puede eliminar la scooter porque tiene dependencia con otras tablas. Eliminalas antes que esta.");
+        }
+        
+        if (!editado)
+            throw new ServerExecutionException ("No se ha podido eliminar la scooter", parametros);
+        
+        Map<String,String> result = util.Util.convertObjectToMap(scooter);
+        return result;
     }
     
 }

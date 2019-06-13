@@ -79,8 +79,8 @@ CREATE TABLE IF NOT EXISTS EstadoScooter (
     estadoBateria DOUBLE(5,2) NOT NULL,
     velocidad INT(3) NOT NULL,
     -- Posición almacenada en la tabla sobre la scooter
-    posicionLat INT(15),
-    posicionAlt INT(15),
+    posicionLat decimal(10,6),
+    posicionLon decimal(10,6),
     -- Foreign keys
     scooter_id INT NOT NULL,
     alquiler_id INT NOT NULL,
@@ -163,15 +163,17 @@ CREATE TABLE IF NOT EXISTS Incidencia (
     id INT PRIMARY KEY AUTO_INCREMENT,
     descripcion VARCHAR(300),
     -- Posición almacenada en la tabla sobre la scooter
-    posicionLat INT(15),
-    posicionAlt INT(15),
+    posicionLat decimal(10,6),
+    posicionLon decimal(10,6),
     -- Foreign keys
     tipoIncidencia_id INT NOT NULL,
     cliente_id INT NOT NULL,
+    scooter_id INT NOT NULL,
     alquiler_id INT,
     mantenimiento_id INT,
     CONSTRAINT tiinfk FOREIGN KEY (tipoIncidencia_id) REFERENCES TipoIncidencia(id),
     CONSTRAINT clinfk FOREIGN KEY (cliente_id) REFERENCES Cliente(id),
+    CONSTRAINT scinfk FOREIGN KEY (scooter_id) REFERENCES Scooter(id),
     CONSTRAINT alinfk FOREIGN KEY (alquiler_id) REFERENCES Alquiler(id),
     CONSTRAINT mainfk FOREIGN KEY (mantenimiento_id) REFERENCES Mantenimiento(id)
 ) ENGINE=INNODB;
@@ -203,6 +205,8 @@ CREATE TABLE IF NOT EXISTS Empleado (
     puesto_id INT NOT NULL,
     ciudad_id INT NOT NULL,
     sede_id INT NOT NULL,
+    fecha_alta DATE NOT NULL,
+    fecha_baja DATE,
     CONSTRAINT puemfk FOREIGN KEY (puesto_id) REFERENCES Puesto(id),
     CONSTRAINT ciemfk FOREIGN KEY (ciudad_id) REFERENCES Ciudad(id),
     CONSTRAINT seemfk FOREIGN KEY (sede_id) REFERENCES Sede(id)

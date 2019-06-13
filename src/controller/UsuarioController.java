@@ -46,6 +46,10 @@ public class UsuarioController extends GenericController implements IUsuarioCont
             throw new ServerExecutionException ("Nombre o contraseña erronea");
         }
         
+        if (cliente.getActivada()==0) {
+            throw new ServerExecutionException ("Esta cuenta no está activada, por lo que no se puede utilizar. Ponte en contacto con el administrador para saber más información.");
+        }
+        
         Map<String, String> result = Util.convertObjectToMap(cliente);
         
         // Generamos, almacenamos y enviamos el token. Tiene que ser aleatoria.
@@ -62,7 +66,7 @@ public class UsuarioController extends GenericController implements IUsuarioCont
         
         if (alquiler!=null) {
             // Si el valor es 1 significa que está reservando, si el valor es 2 el valor es 
-            result.put("state", alquiler.getEstadoalquiler().getId()==2 ? "1" : "2");
+            result.put("state", alquiler.getEstadoalquiler().getId()==1 ? "1" : "2");
             // Coges el tiempo que llevabas
             result.put("time", alquiler.getFechaInicio().getTime()+"");
             // Coges el noSerie de la scooter de la moto alquilada
@@ -141,5 +145,76 @@ public class UsuarioController extends GenericController implements IUsuarioCont
         Map<String,String> clienteInfo = login(criterios);
         
         return clienteInfo;
+    }
+    
+    public Map<String,String> updateCliente (Map<String,String> parametros) throws ServerExecutionException {
+        Cliente cliente = (Cliente) util.Util.convertMapToObject(Cliente.class, parametros);
+        
+        System.out.println("ID: " + cliente.getId());
+        
+        HibernateManager hm = this.getHManager();
+        Cliente lastCliente = (Cliente) hm.getObject(Cliente.class, cliente.getId());
+        
+        // Cogemos los datos que no queremos que sea modificado
+        cliente.setActivada(lastCliente.getActivada());
+        cliente.setFechaCreacion(lastCliente.getFechaCreacion());
+        cliente.setPass(lastCliente.getPass());
+        
+        Boolean editado = hm.updateObject(cliente);
+        
+        if (!editado)
+            throw new ServerExecutionException ("No se ha podido editar el cliente", parametros);
+        
+        Map<String,String> result = util.Util.convertObjectToMap(cliente);
+        return result;
+    }
+    
+    public Map<String,String> darBajaCliente (Map<String,String> parametros) throws ServerExecutionException {
+        Integer id = Integer.parseInt(parametros.get("id"));
+        
+        HibernateManager hm = this.getHManager();
+        Cliente cliente = (Cliente) hm.getObject(Cliente.class, id);
+        if (cliente==null)
+            throw new ServerExecutionException("El cliente no existe");
+        
+        if (cliente.getActivada()==0)
+            throw new ServerExecutionException("El cliente ya estaba dado de baja");
+        
+        cliente.setActivada((byte)0);
+        boolean editado = hm.updateObject(cliente);
+        
+        if (!editado)
+            throw new ServerExecutionException ("No se ha podido dar de baja al cliente", parametros);
+        
+        Map<String,String> result = util.Util.convertObjectToMap(cliente);
+        return result;
+    }
+    
+    public Map<String, String> getClientes() throws ServerExecutionException {
+        List<Cliente> clientes = this.getHManager().getObjects("Cliente");
+        
+        if (clientes==null || clientes.isEmpty()) {
+            throw new ServerExecutionException ("No se ha encontrado ningún cliente");
+        }
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("length", clientes.size()+"");
+        for (int i = 0; i < clientes.size(); i++) {
+             result.putAll(Util.convertObjectToMap(clientes.get(i), "["+i+"]"));
+        }
+        
+        return result;
+    }
+    
+    public Map<String, String> getCliente(Map<String,String> parametros) throws ServerExecutionException {
+        Integer id = Integer.parseInt(parametros.get("id"));
+        
+        Cliente cliente = (Cliente) this.getHManager().getObject(Cliente.class, id);
+        
+        if (cliente==null) 
+            throw new ServerExecutionException ("No se ha encontrado al cliente con ID " + id);
+        
+        Map<String, String> result = util.Util.convertObjectToMap(cliente);
+        return result;
     }
 }

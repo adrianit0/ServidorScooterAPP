@@ -69,6 +69,62 @@
                 <param type="parameters" />
             </params>
         </mapping>
+        <mapping link="desconectar" className="controller.UsuarioController" method="desconectar" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="cliente" />
+            </white-list>
+        </mapping>
+        <mapping link="updateCliente" className="controller.UsuarioController" method="updateCliente" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="bajaCliente" className="controller.UsuarioController" method="darBajaCliente" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="getClientes" className="controller.UsuarioController" method="getClientes" return="map" token="true">
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="getCliente" className="controller.UsuarioController" method="getCliente" return="map" token="false">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        
+        
+        
+        <!-- Métodos para las incidencias -->
+        <mapping link="enviarIncidencia" className="controller.IncidenciaController" method="enviarIncidencia" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="cliente" />
+                <role name="tecnico" />
+                <role name="administrador" />
+                <role name="scooter" />
+            </white-list>
+        </mapping>
         
         
         
@@ -96,6 +152,21 @@
             <white-list>
                 <role name="cliente" />
                 <role name="tecnico" />
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="getScootersBBDD" className="controller.ScooterController" method="getScootersBBDD" return="map" token="true">
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="getScooterBBDD" className="controller.ScooterController" method="getScooterBBDD" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
                 <role name="administrador" />
                 <role name="directivo" />
             </white-list>
@@ -132,7 +203,24 @@
                 <role name="cliente" />
             </white-list>
         </mapping>
-        
+        <mapping link="updateScooter" className="controller.ScooterController" method="updateScooter" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="deleteScooter" className="controller.ScooterController" method="deleteScooter" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
         
         <!-- Métodos para los bonos -->
         <mapping link="getBonos" className="controller.BonoController" method="getBonos" return="map" token="true">
@@ -195,6 +283,21 @@
         
         
         <!-- Métodos para la administración -->
+        <mapping link="loginAsAdministrador" className="controller.EmpleadoController" method="loginAsAdministrador" return="map" token="false">
+            <params>
+                <param type="parameters" />
+            </params>
+        </mapping>
+        <mapping link="loginAsEmpleado" className="controller.EmpleadoController" method="loginAsEmpleado" return="map" token="false">
+            <params>
+                <param type="parameters" />
+            </params>
+        </mapping>
+        <mapping link="loginAsDirectivo" className="controller.EmpleadoController" method="loginAsDirectivo" return="map" token="false">
+            <params>
+                <param type="parameters" />
+            </params>
+        </mapping>
         <mapping link="getEmpleados" className="controller.EmpleadoController" method="getEmpleados" return="map" token="false">
             <white-list>
                 <role name="administrador" />
@@ -205,12 +308,6 @@
             <params>
                 <param type="parameters" />
             </params>
-            <white-list>
-                <role name="administrador" />
-                <role name="directivo" />
-            </white-list>
-        </mapping>
-        <mapping link="getClientes" className="controller.EmpleadoController" method="getClientes" return="map" token="true">
             <white-list>
                 <role name="administrador" />
                 <role name="directivo" />
@@ -245,7 +342,53 @@
                 <role name="directivo" />
             </white-list>
         </mapping>
+        <mapping link="bajaEmpleado" className="controller.CrudController" method="darBajaEmpleado" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
         
+        <!-- Item reducido -->
+        <mapping link="getCiudades" className="controller.ItemReducidoController" method="getCiudades" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="getPuestos" className="controller.ItemReducidoController" method="getPuestos" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="getSedes" className="controller.ItemReducidoController" method="getSedes" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="getModelos" className="controller.ItemReducidoController" method="getModelos" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
         
     </mappers>
 </configuration-mapper>

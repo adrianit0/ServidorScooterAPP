@@ -544,7 +544,7 @@ public class ScooterServerTCP extends Thread{
     }
 
     // Obtiene un cliente a partir de su socket
-    protected synchronized ClienteInfo getClient(String token) {
+    public synchronized ClienteInfo getClient(String token) {
         return usuariosConectados.get(token);
     }
     

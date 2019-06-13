@@ -1,6 +1,4 @@
 package entidades;
-// Generated 28-abr-2019 23:19:03 by Hibernate Tools 4.3.1
-
 
 import anotaciones.Ignore;
 import java.util.HashSet;

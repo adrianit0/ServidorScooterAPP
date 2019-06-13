@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
 "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
-<!-- Generated 28-abr-2019 23:19:04 by Hibernate Tools 4.3.1 -->
+
 <hibernate-mapping>
     <class name="entidades.Empleado" table="empleado" catalog="scooterapp" optimistic-lock="version">
         <id name="id" type="java.lang.Integer">
@@ -40,6 +40,12 @@
         </property>
         <property name="sueldo" type="double">
             <column name="sueldo" precision="8" not-null="true" />
+        </property>
+        <property name="fechaAlta" type="date">
+            <column name="fecha_alta" length="10" not-null="true" />
+        </property>
+        <property name="fechaBaja" type="date">
+            <column name="fecha_baja" length="10" />
         </property>
         <set name="tareas" table="tarea" inverse="true" lazy="true" fetch="select">
             <key>

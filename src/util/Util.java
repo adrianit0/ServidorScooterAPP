@@ -336,13 +336,13 @@ public class Util {
     // usando un sistema de entidades parecidas a la que utiliza HTML
     private static String transformarKeyValue (String texto) {
         if (texto==null) return null;
-        return texto.replaceAll("[&]", "&a").replaceAll("["+separatorArgs+"]", "&d")/*.replaceAll("[{]", "&i").replaceAll("[}]", "&f")*/.replaceAll("[|]", "&p").replaceAll("["+separator+"]", "&c");
+        return texto.replaceAll("[&]", "&a").replaceAll("\n", "&s").replaceAll("["+separatorArgs+"]", "&d")/*.replaceAll("[{]", "&i").replaceAll("[}]", "&f")*/.replaceAll("[|]", "&p").replaceAll("["+separator+"]", "&c");
     }
     
     // Vuelve a convertir de las entidades al que habia antes
     private static String destransformarKeyValue (String texto) {
         if (texto==null) return null;
-        return texto.replaceAll("&c", separator).replaceAll("&p", "|")/*.replaceAll("&f", "}").replaceAll("&i", "{")*/.replaceAll("&d", separatorArgs).replaceAll("[&]", "&a");
+        return texto.replaceAll("&c", separator).replaceAll("&p", "|")/*.replaceAll("&f", "}").replaceAll("&i", "{")*/.replaceAll("&d", separatorArgs).replaceAll("&s", "\n").replaceAll("[&]", "&a");
     }
     
     /**
@@ -538,5 +538,14 @@ public class Util {
     // Mejoraría cambiar el cifrado
     public static String crearTokenUsuario () {
         return Integer.toString(Math.abs(Double.toString(Math.random()*Math.random()).hashCode()));
+    }
+    
+    public static Integer parseInt(String valor) {
+        try {
+            return Integer.parseInt(valor);
+        } catch (Exception e) {
+            System.err.println("Util::parseInt error: No se ha podido parsear: " + e.getMessage());
+            return null;
+        }
     }
 }

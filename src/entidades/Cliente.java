@@ -1,6 +1,4 @@
 package entidades;
-// Generated 28-abr-2019 23:19:03 by Hibernate Tools 4.3.1
-
 
 import anotaciones.Ignore;
 import java.util.Date;
@@ -27,8 +25,11 @@ public class Cliente  implements java.io.Serializable {
 
     public Cliente() {
     }
+    
+    public Cliente (Integer id) {
+        this.id = id;
+    }
 
-	
     public Cliente(String nombre, String apellido1, String nick, String email, String pass, int minutos, byte activada, Date fechaCreacion) {
         this.nombre = nombre;
         this.apellido1 = apellido1;
