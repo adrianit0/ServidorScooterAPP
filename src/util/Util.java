@@ -5,10 +5,14 @@
  */
 package util;
 
+import excepciones.CifrarMD5Exception;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.math.BigInteger;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -21,6 +25,7 @@ import java.util.regex.Pattern;
  * @author adrian
  */
 public class Util {
+
     /**
      * Convierte codigos dificiles de enviar por letras distinguibles.
      * 
@@ -546,6 +551,23 @@ public class Util {
         } catch (Exception e) {
             System.err.println("Util::parseInt error: No se ha podido parsear: " + e.getMessage());
             return null;
+        }
+    }
+    
+    /**
+     * Convierte un texto plano en el cifrado MD5
+     * */
+    public static String getMd5(String input) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] messageDigest = md.digest(input.getBytes());
+            BigInteger no = new BigInteger(1, messageDigest);
+            String hashtext = no.toString(16);
+            while (hashtext.length() < 32)
+                hashtext = "0" + hashtext;
+            return hashtext;
+        } catch (NoSuchAlgorithmException e) {
+            throw new CifrarMD5Exception(e);
         }
     }
 }

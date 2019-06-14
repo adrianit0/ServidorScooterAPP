@@ -49,7 +49,7 @@ public class Main {
         System.out.println(reconverted);*/
         //System.out.println((texto.equals(reconverted)?"Son iguales":"No son iguales"));
         
-        Map<String,String> parametros = new HashMap<>();
+        /*Map<String,String> parametros = new HashMap<>();
         parametros.put("nombre", "Adrian");
         parametros.put("sueldo", "564.6");
         
@@ -57,7 +57,9 @@ public class Main {
         e = (Empleado ) util.Util.convertMapToObject(Empleado.class, parametros);
         
         System.out.println(e.getSueldo());
-        System.out.println(e.getNombre());
+        System.out.println(e.getNombre());*/
+        
+        System.out.println(util.Util.getMd5("d"));
     }
     
     private void test () {
@@ -112,7 +114,6 @@ public class Main {
             String value = entry.getValue();
             
             System.out.println(key+ ": " + value);
-            
         }
 
         PaqueteCliente pCliente = util.Util.unpackToCliente(texto);
