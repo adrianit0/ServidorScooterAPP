@@ -17,11 +17,5 @@
         <property name="fechaFin" type="timestamp">
             <column name="fecha_fin" length="19" not-null="true" />
         </property>
-        <set name="incidencias" table="incidencia" inverse="true" lazy="true" fetch="select">
-            <key>
-                <column name="mantenimiento_id" />
-            </key>
-            <one-to-many class="entidades.Incidencia" />
-        </set>
     </class>
 </hibernate-mapping>

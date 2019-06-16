@@ -138,6 +138,39 @@ public class HibernateManager {
 
         return objetos;
     }
+    
+    public List getObjectsWithoutLazyObjects (String tabla, String consulta, String... methods) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = null;
+
+        List objetos = null;
+
+        try {
+            tx = session.beginTransaction();
+            objetos = session.createQuery("FROM " + tabla + " " + consulta).list();
+            
+            for (Object o : objetos) {
+                // Forzamos a Hibernate a ejecutar ciertos métodos para tomarlo del servidor
+                for (String m : methods) {
+                    Method meth = o.getClass().getMethod(m);
+                    Object t = meth.invoke(o);
+                    
+                    if (t!=null) 
+                        t.toString();
+                }
+            }
+            tx.commit();
+        } catch (HibernateException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return objetos;
+    }
 
     public Object getObject(Class clase, Integer primaryKey) {
         Session session = HibernateUtil.getSessionFactory().openSession();
@@ -174,7 +207,8 @@ public class HibernateManager {
             // Forzamos a Hibernate a ejecutar ciertos métodos para tomarlo del servidor
             for (String m : methods) {
                 Method meth = objeto.getClass().getMethod(m);
-                meth.invoke(objeto);
+                Object t = meth.invoke(objeto);
+                t.toString();
             }
             
             tx.commit();

@@ -13,6 +13,10 @@ public class Tipotarea  implements java.io.Serializable {
 
     public Tipotarea() {
     }
+    
+    public Tipotarea(Integer id) {
+        this.id=id;
+    }
 
 	
     public Tipotarea(String nombre) {

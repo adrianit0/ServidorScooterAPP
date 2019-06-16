@@ -17,8 +17,14 @@
         <many-to-one name="tipotarea" class="entidades.Tipotarea" fetch="select">
             <column name="tipoTarea_id" not-null="true" />
         </many-to-one>
+        <many-to-one name="mantenimiento" class="entidades.Mantenimiento" fetch="select">
+            <column name="mantenimiento_id" not-null="true" />
+        </many-to-one>
         <property name="nombre" type="string">
             <column name="nombre" length="60" not-null="true" />
+        </property>
+        <property name="observaciones" type="string">
+            <column name="observaciones" length="300" not-null="true" />
         </property>
         <property name="fechaAsignacion" type="timestamp">
             <column name="fecha_asignacion" length="19" not-null="true" />

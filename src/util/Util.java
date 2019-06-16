@@ -143,11 +143,6 @@ public class Util {
                     continue;
                 }
                 
-                // Es un objeto ??
-                if (type[1].charAt(0)=='{' && type[1].charAt(type[1].length()-1)=='}') {
-                    
-                }
-                
                 parametros.put(destransformarKeyValue(type[0]), destransformarKeyValue(type[1]));
             }
         }
@@ -512,7 +507,8 @@ public class Util {
                     System.out.println(o);
                     parametros.put(f.getName()+extra, o==null?null:o.toString());
                 } catch (NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-                    System.err.println("Error en "+ f.getName() + ": "+ex.getMessage() + " ("+ex.getClass().getName()+")");
+                    System.err.println("Util::convertObjectToMap error en "+ f.getName() + ": "+ex.getMessage() + " ("+ex.getClass().getName()+")");
+                    //ex.printStackTrace();
                 } catch (org.hibernate.LazyInitializationException e) {
                     System.err.println("Util::convertObjectToMap: El método " + methodName + "() tiene valor lazy (Corregir)");
                 }

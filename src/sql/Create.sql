@@ -38,6 +38,7 @@ CREATE TABLE IF NOT EXISTS Scooter (
     codigo INT(6) NOT NULL UNIQUE,
     fechaCompra DATE NOT NULL,
     precioCompra DOUBLE(8,2) NOT NULL,
+    fechaBaja DATE,
     -- Posición almacenada en la tabla sobre la scooter
     posicionLat DECIMAL(10,6),
     posicionLon DECIMAL(10,6),
@@ -162,6 +163,7 @@ CREATE TABLE IF NOT EXISTS Mantenimiento (
 CREATE TABLE IF NOT EXISTS Incidencia (
     id INT PRIMARY KEY AUTO_INCREMENT,
     descripcion VARCHAR(300),
+    fechaCreacion TIMESTAMP NOT NULL,
     -- Posición almacenada en la tabla sobre la scooter
     posicionLat decimal(10,6),
     posicionLon decimal(10,6),
@@ -226,14 +228,17 @@ CREATE TABLE TipoTarea (
 CREATE TABLE Tarea (
     id INT PRIMARY KEY AUTO_INCREMENT,
     nombre VARCHAR(60) NOT NULL,
+    observaciones VARCHAR(300) NOT NULL,
     fecha_asignacion TIMESTAMP NOT NULL,
     estimacion INT NOT NULL, -- EL tiempo en minutos
     empleado_id INT NOT NULL,
     tipoTarea_id INT NOT NULL,
     estadoTarea_id INT NOT NULL,
+    mantenimiento_id INT NOT NULL,
     CONSTRAINT emtafk FOREIGN KEY (empleado_id) REFERENCES Empleado(id),
     CONSTRAINT titafk FOREIGN KEY (tipoTarea_id) REFERENCES TipoTarea(id),
-    CONSTRAINT estafk FOREIGN KEY (estadoTarea_id) REFERENCES EstadoTarea(id)
+    CONSTRAINT estafk FOREIGN KEY (estadoTarea_id) REFERENCES EstadoTarea(id),
+    CONSTRAINT matafk FOREIGN KEY (mantenimiento_id) REFERENCES Mantenimiento(id)
 ) ENGINE=INNODB;
 
 CREATE TABLE Horario (

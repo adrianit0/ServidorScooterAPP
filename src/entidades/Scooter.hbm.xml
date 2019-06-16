@@ -23,6 +23,9 @@
         <property name="fechaCompra" type="date">
             <column name="fechaCompra" length="10" not-null="true" />
         </property>
+        <property name="fechaBaja" type="date">
+            <column name="fechaBaja" length="10" />
+        </property>
         <property name="precioCompra" type="double">
             <column name="precioCompra" precision="8" not-null="true" />
         </property>

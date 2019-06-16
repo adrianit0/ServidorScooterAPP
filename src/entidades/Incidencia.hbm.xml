@@ -32,6 +32,9 @@
         <property name="posicionLon" type="java.lang.Double">
             <column name="posicionLon" />
         </property>
+        <property name="fechaCreacion" type="timestamp">
+            <column name="fechaCreacion" length="19" not-null="true" />
+        </property>
         <set name="imagens" table="imagen" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="incidencia_id" not-null="true" />

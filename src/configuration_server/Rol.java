@@ -10,7 +10,7 @@ package configuration_server;
  * @author agarcia.gonzalez
  */
 public enum Rol {
-    CLIENTE("cliente"), EMPLEADO("empleado", "trabajador"), ADMINISTRADOR("administrador", "admin"), SCOOTER("scooter", "moto"), DIRECTIVO("directivo");
+    CLIENTE("cliente"), EMPLEADO("tecnico", "empleado", "trabajador"), ADMINISTRADOR("administrador", "admin"), SCOOTER("scooter", "moto"), DIRECTIVO("directivo");
     
     private String[] nombres;
     

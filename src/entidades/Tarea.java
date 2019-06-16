@@ -1,5 +1,6 @@
 package entidades;
 
+import anotaciones.Ignore;
 import java.util.Date;
 
 
@@ -7,10 +8,12 @@ public class Tarea  implements java.io.Serializable {
 
 
      private Integer id;
-     private Empleado empleado;
-     private Estadotarea estadotarea;
-     private Tipotarea tipotarea;
+     private @Ignore Empleado empleado;
+     private @Ignore Estadotarea estadotarea;
+     private @Ignore Tipotarea tipotarea;
+     private @Ignore Mantenimiento mantenimiento;
      private String nombre;
+     private String observaciones;
      private Date fechaAsignacion;
      private int estimacion;
 
@@ -33,6 +36,15 @@ public class Tarea  implements java.io.Serializable {
     public void setId(Integer id) {
         this.id = id;
     }
+
+    public String getObservaciones() {
+        return observaciones;
+    }
+
+    public void setObservaciones(String observaciones) {
+        this.observaciones = observaciones;
+    }
+    
     public Empleado getEmpleado() {
         return this.empleado;
     }
@@ -76,9 +88,13 @@ public class Tarea  implements java.io.Serializable {
         this.estimacion = estimacion;
     }
 
+    public Mantenimiento getMantenimiento() {
+        return mantenimiento;
+    }
 
-
-
+    public void setMantenimiento(Mantenimiento mantenimiento) {
+        this.mantenimiento = mantenimiento;
+    }
 }
 
 

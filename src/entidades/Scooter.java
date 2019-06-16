@@ -6,7 +6,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 
-public class Scooter  implements java.io.Serializable {
+public class Scooter {
 
 
      private Integer id;
@@ -18,6 +18,7 @@ public class Scooter  implements java.io.Serializable {
      private boolean bloqueada;
      private int codigo;
      private Date fechaCompra;
+     private Date fechaBaja;
      private double precioCompra;
      private Double posicionLat;
      private Double  posicionLon;
@@ -50,6 +51,14 @@ public class Scooter  implements java.io.Serializable {
         this.precioCompra = precioCompra;
         this.posicionLat = posicionLat;
         this.posicionLon = posicionLon;
+    }
+
+    public Date getFechaBaja() {
+        return fechaBaja;
+    }
+
+    public void setFechaBaja(Date fechaBaja) {
+        this.fechaBaja = fechaBaja;
     }
 
     public Float getBateria() {
@@ -158,9 +167,10 @@ public class Scooter  implements java.io.Serializable {
         this.mantenimientos = mantenimientos;
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return "Scooter{" + "noSerie=" + noSerie + '}';
+    }
 }
 
 

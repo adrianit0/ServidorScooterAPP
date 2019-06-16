@@ -12,6 +12,7 @@ import entidades.Incidencia;
 import entidades.Scooter;
 import entidades.Tipoincidencia;
 import excepciones.ServerExecutionException;
+import java.sql.Timestamp;
 import java.util.HashMap;
 import java.util.Map;
 import servidor.ClienteInfo;
@@ -58,6 +59,7 @@ public class IncidenciaController extends GenericController {
         incidencia.setAlquiler(alquiler);
         incidencia.setCliente(new Cliente ((int) info.getId()));
         incidencia.setScooter(scooter);
+        incidencia.setFechaCreacion(new Timestamp(System.currentTimeMillis()));
         
         Integer id = this.getMh().addObject(incidencia);
         

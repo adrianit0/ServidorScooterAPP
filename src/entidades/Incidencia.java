@@ -1,5 +1,6 @@
 package entidades;
 
+import java.sql.Timestamp;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -9,6 +10,7 @@ public class Incidencia  implements java.io.Serializable {
      private String descripcion;
      private Double posicionLat;
      private Double posicionLon;
+     private Timestamp fechaCreacion;
      
      private Scooter scooter;
      private Alquiler alquiler;
@@ -43,6 +45,14 @@ public class Incidencia  implements java.io.Serializable {
     
     public void setId(Integer id) {
         this.id = id;
+    }
+
+    public Timestamp getFechaCreacion() {
+        return fechaCreacion;
+    }
+
+    public void setFechaCreacion(Timestamp fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
     }
 
     public Scooter getScooter() {

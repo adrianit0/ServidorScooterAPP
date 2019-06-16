@@ -73,6 +73,20 @@ public class EmpleadoController extends GenericController {
         return result;
     }
     
+    public Map<String, String> desconectar(Map<String, String> parameters) throws ServerExecutionException {
+        Integer idThread = Integer.parseInt(parameters.get("idThread"));
+        
+        boolean desconectado = this.getServer().desconectarUsuario(idThread);
+        
+        if (!desconectado)
+            throw new ServerExecutionException ("Error al intentar desconectar del servidor");
+        
+        Map<String, String> result = new HashMap<>();
+        result.put("status", "ok");
+        
+        return result;
+    }
+    
     public Map<String, String> getEmpleados() throws ServerExecutionException {
         List<Empleado> empleados = this.getHManager().getObjects("Empleado");
         

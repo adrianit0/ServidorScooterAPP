@@ -13,6 +13,10 @@ public class Estadotarea  implements java.io.Serializable {
 
     public Estadotarea() {
     }
+    
+    public Estadotarea(Integer id){
+        this.id=id;
+    }
 
 	
     public Estadotarea(String nombre, String descripcion) {
