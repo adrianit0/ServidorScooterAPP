@@ -159,11 +159,10 @@ public class TareaController extends GenericController {
         for (Tarea t : tareas) {
             Mantenimiento m = (Mantenimiento) getMh().getObjectWithoutLazyObjects(Mantenimiento.class, t.getMantenimiento().getId(), "getScooter");
             Scooter scooter = (Scooter) getMh().getObject(Scooter.class, m.getScooter().getId());
-            System.out.println("Scooter: " + scooter.toString());
+           
             Map<String,String> contenidoTarea = util.Util.convertObjectToMap(t, "[" + i + "]");
             Map<String,String> contenidoScooter = util.Util.convertObjectToMap(scooter, "[" + i + "]");
             
-            System.out.println(contenidoScooter);
             result.putAll(contenidoScooter);
             result.putAll(contenidoTarea);
             result.put("tipoTareaId[" + i + "]", t.getTipotarea().getId().toString());

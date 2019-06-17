@@ -48,7 +48,6 @@ public class HibernateManager {
 
         try {
             tx = session.beginTransaction();
-            System.out.println("FROM " + tabla + condicion);
             objetos = session.createQuery("FROM " + tabla + condicion).list();
             tx.commit();
         } catch (HibernateException e) {

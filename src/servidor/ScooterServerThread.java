@@ -60,17 +60,10 @@ public class ScooterServerThread extends Thread {
             
             try {
                 inputLine = in.readLine();
-                
-                // Si el mensaje viene del navegador devolvamos un mensaje de FORBIDDEN
-                /*if (inputLine.equals("GET / HTTP/1.1")) {
-                    out.println("403");
-                    continue;
-                }*/
 
                 outputLine = ejecutarMetodo (inputLine);
                 
                 out.println(outputLine);
-                
             } catch (IOException e) {
                 System.err.println("ScooterServerThread::run: No se ha podido realizar la consulta: " + e.getMessage());
                 listening=false;
@@ -119,7 +112,7 @@ public class ScooterServerThread extends Thread {
             if (metodo == null) {
                 System.err.println("Método " + packServer.getUri() + " no existe");
                 errores = true;
-                packServer.getArgumentos().put("error", "Método " + packServer.getUri() + " no existe");
+                error = "Método " + packServer.getUri() + " no existe";
             }
 
             // Si el método necesita token, se tendrá que comprobar que el usuario/token es el mismo
@@ -127,13 +120,10 @@ public class ScooterServerThread extends Thread {
                 boolean puedeRealizarAccion = servidor.puedeRealizarAccion(packServer.getToken(), packServer.getNick());
 
                 if (!puedeRealizarAccion) {
-                    System.out.println("ScooterServerThread::ejecutarMetodo error: No puede ejecutar método. No tiene los permisos");
+                    System.out.println("ScooterServerThread::ejecutarMetodo error: " + packServer.getNick() + " no puede ejecutar método. No tiene token de sesión o ha expirado.");
                     errores = true;
-                    System.out.println("Token: " + packServer.getToken());
                     if (packServer.getToken().isEmpty()) {
                         error = "No existe token para esta sesión";
-                    } else if (!servidor.estaConectado(packServer.getToken())) {
-                        error = "No hay token de sesión para este usuario";
                     } else {
                         error = "El token de sesión no coincide";
                     }
@@ -150,10 +140,6 @@ public class ScooterServerThread extends Thread {
                     }
                 }
             }
-        }
-        if (!errores && metodo==null) {
-            errores = true;
-            error = "No hay método para ejecutar";
         }
         
         PaqueteCliente packCliente = new PaqueteCliente();

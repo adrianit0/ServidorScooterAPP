@@ -225,8 +225,6 @@ public class ScooterServerTCP extends Thread{
             System.err.println("ScooterServerTCP::cancelarReservaScooter error: no se ha actualizado el alquiler");
             throw new AlquilerException ("No se ha podido actualizar el alquiler");
         }
-        
-        
     }
     
     public synchronized void empezarAlquiler (String token, Scooter scooter) throws AlquilerException {
@@ -335,7 +333,7 @@ public class ScooterServerTCP extends Thread{
         return alquiler;
     }
     
-    public Alquiler getAlquiler (String nick) {
+    public synchronized Alquiler getAlquiler (String nick) {
         return alquileres.get(nick);
     }
     
@@ -434,7 +432,7 @@ public class ScooterServerTCP extends Thread{
             boolean vigente = puedeRealizarAccion(token, info.getNombre());
             if (vigente) {
                 usuariosConectados.get(token).setIdThread(info.getIdThread());
-                System.out.println("Usuario con token " + token + " se ha reconectado.");
+                System.out.println("Usuario con nick " + info.getNombre() + " y token " + token + " se ha reconectado.");
                 return token;
             }
             // En caso contrario cogerá un nuevo token
@@ -443,7 +441,7 @@ public class ScooterServerTCP extends Thread{
         token = Util.crearTokenUsuario();
         info.setTimeSinceLastAction(System.currentTimeMillis());
         usuariosConectados.put(token, info);
-        System.out.println("Usuario con token " + token + " conectado.");
+        System.out.println("Usuario con nick " + info.getNombre() + " y token " + token + " se ha conectado.");
         return token;
     }
     
@@ -489,12 +487,11 @@ public class ScooterServerTCP extends Thread{
     
     /**
      * Un puede realizar acción sin necesidad de dar el nick.
-     *
      * Es menos seguro que el que confirma si el nick está presente.
-     *
      * Sirve para el sistema UTP en la que ya tiene una conexión.
      */
-    public synchronized boolean puedeRealizarAccion(String token) {
+    @Deprecated
+    private synchronized boolean puedeRealizarAccion(String token) {
         // Miramos si el token recibido existe actualmente entre los
         // conectados. De no existir mandamos un error y obligamos al cliente a 
         // salirse de estar conectado.
@@ -531,7 +528,7 @@ public class ScooterServerTCP extends Thread{
         return info.getRol() == Rol.ADMINISTRADOR;
     }
 
-    public synchronized String containsName(String nick) {
+    private synchronized String containsName(String nick) {
         for (Map.Entry<String, ClienteInfo> entry : usuariosConectados.entrySet())
             if (nick.contains(entry.getValue().getNombre())) 
                 return entry.getKey();
@@ -546,9 +543,5 @@ public class ScooterServerTCP extends Thread{
     // Obtiene un cliente a partir de su socket
     public synchronized ClienteInfo getClient(String token) {
         return usuariosConectados.get(token);
-    }
-    
-    public static void main(String[] args) {
-        (new ScooterServerTCP(4444)).start();
     }
 }
