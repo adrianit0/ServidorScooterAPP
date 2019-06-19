@@ -115,6 +115,7 @@ public class ScooterController extends GenericController {
         this.getServer().addScooter(scooter);
         
         Map<String,String> result = new HashMap<>();
+        result.put("nick", info.getNombre());
         result.put("token", token);
         
         return result;
@@ -302,11 +303,10 @@ public class ScooterController extends GenericController {
             throw new ServerExecutionException (e.getMessage());
         }
         
-        
         if (alquiler==null)
             throw new ServerExecutionException ("No existe alquiler para este usuario");
         
-        // Le mandamos la señal a la scooter para que se encienda
+        // Le mandamos la señal a la scooter para que se apague
         Map<String,String> scooterParametros = new HashMap<>();
         scooterParametros.put("status", "ok");
         String idPaquete = "bloquear"+alquiler.getScooter().getCodigo();
@@ -398,6 +398,52 @@ public class ScooterController extends GenericController {
         Map<String,String> result = new HashMap<>();
         result.put("status", "ok");
         
+        return result;
+    }
+    
+    public Map<String,String> actualizarPosicionScooter (Map<String,String> parametros) throws ServerExecutionException {
+        String token = parametros.get("token");
+        double latitude = Double.parseDouble(parametros.get("latitud"));
+        double longitude = Double.parseDouble(parametros.get("longitud"));
+        
+        ClienteInfo info = getServer().getClient(token);
+        if (info==null)
+            throw new ServerExecutionException("Cliente scooter no encontrada");
+        
+        Scooter scooter = getServer().getScooter(info.getNombre());
+        if (scooter==null) 
+            throw new ServerExecutionException("Scooter no encontrada");
+        
+        scooter.setPosicionLat(latitude);
+        scooter.setPosicionLon(longitude);
+        
+        // Guardamos la nueva posición en la base de datos
+        Scooter scooterBD = (Scooter) getMh().getObject(Scooter.class, scooter.getId());
+        scooterBD.setPosicionLat(latitude);
+        scooterBD.setPosicionLon(longitude);
+        boolean actualizado = getMh().updateObject(scooterBD);
+        
+        if (!actualizado)
+            throw new ServerExecutionException("no se ha podido actualizar la posición de la scooter");
+        
+        Map<String,String> result = new HashMap<>();
+        result.put("status", "ok");
+        
+        return result;
+    }
+    
+    public Map<String,String> getPosicionScooter (Map<String,String> parametros) throws ServerExecutionException {
+        String noSerie = parametros.get("noSerie");
+        
+        Scooter scooter = this.getServer().getScooter(noSerie);
+        
+        if (scooter==null)
+            throw new ServerExecutionException ("No se ha encontrado la scooter.");
+        
+        
+        Map<String,String> result = new HashMap<>();
+        result.put("latitud", scooter.getPosicionLat()+"");
+        result.put("longitud", scooter.getPosicionLon()+"");
         return result;
     }
     

@@ -305,6 +305,22 @@
                 <role name="directivo" />
             </white-list>
         </mapping>
+        <mapping link="actualizarPosicion" className="controller.ScooterController" method="actualizarPosicionScooter" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="scooter" />
+            </white-list>
+        </mapping>
+        <mapping link="getPosicionScooter" className="controller.ScooterController" method="getPosicionScooter" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="cliente" />
+            </white-list>
+        </mapping>
         
         <!-- Métodos para los bonos -->
         <mapping link="getBonos" className="controller.BonoController" method="getBonos" return="map" token="true">
