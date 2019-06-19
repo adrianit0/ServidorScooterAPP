@@ -14,7 +14,7 @@ import configuration_server.Rol;
  * @author Adrián García
  */
 public class ClienteInfo {
-    private long id;
+    private Integer id;
     private String nombre;
     private long timeSinceLastAction;   // Tiempo que ha pasado desde la última acción.
     private Rol rol;                    // Rol que tiene el cliente
@@ -26,7 +26,7 @@ public class ClienteInfo {
 
     
     
-    public ClienteInfo(long id, String nombre, long timeSinceLastAction, Rol rol, Integer idThread) {
+    public ClienteInfo(Integer id, String nombre, long timeSinceLastAction, Rol rol, Integer idThread) {
         this.id = id;
         this.nombre = nombre;
         this.timeSinceLastAction = timeSinceLastAction;
@@ -34,11 +34,11 @@ public class ClienteInfo {
         this.idThread = idThread;
     }
 
-    public long getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

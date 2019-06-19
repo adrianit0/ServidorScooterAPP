@@ -7,8 +7,6 @@ package controller;
 
 import configuration_server.GenericController;
 import configuration_server.Rol;
-import entidades.Alquiler;
-import entidades.Cliente;
 import entidades.Empleado;
 import excepciones.ServerExecutionException;
 import java.sql.Date;
@@ -47,7 +45,7 @@ public class EmpleadoController extends GenericController {
         criterios.put("email", nick);
         criterios.put("pass", pass);
         
-        Empleado empleado = (Empleado) this.getHManager().getObjectCriterio("Empleado", criterios);
+        Empleado empleado = (Empleado) this.getHManager().getObjectCriterioWithoutLazyObjects("Empleado", criterios, "getSede", "getCiudad", "getPuesto");
         
         if (empleado==null) {
             throw new ServerExecutionException ("Nombre o contraseña erronea");
@@ -69,6 +67,9 @@ public class EmpleadoController extends GenericController {
         String token = this.getServer().conectarUsuario(info);
         result.put("token", token);
         result.put("nick", empleado.getEmail());
+        result.put("sede", empleado.getSede().getNombre());
+        result.put("ciudad", empleado.getCiudad().toString());
+        result.put("puesto", empleado.getPuesto().getNombre());
         
         return result;
     }
@@ -76,9 +77,9 @@ public class EmpleadoController extends GenericController {
     public Map<String, String> desconectar(Map<String, String> parameters) throws ServerExecutionException {
         Integer idThread = Integer.parseInt(parameters.get("idThread"));
         
-        boolean desconectado = this.getServer().desconectarUsuario(idThread);
+        int desconectado = this.getServer().desconectarUsuario(idThread);
         
-        if (!desconectado)
+        if (desconectado==0)
             throw new ServerExecutionException ("Error al intentar desconectar del servidor");
         
         Map<String, String> result = new HashMap<>();

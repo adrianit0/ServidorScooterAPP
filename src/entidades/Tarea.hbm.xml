@@ -18,7 +18,7 @@
             <column name="tipoTarea_id" not-null="true" />
         </many-to-one>
         <many-to-one name="mantenimiento" class="entidades.Mantenimiento" fetch="select">
-            <column name="mantenimiento_id" not-null="true" />
+            <column name="mantenimiento_id" />
         </many-to-one>
         <property name="nombre" type="string">
             <column name="nombre" length="60" not-null="true" />

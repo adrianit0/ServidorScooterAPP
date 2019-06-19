@@ -111,6 +111,60 @@ public class HibernateManager {
 
         return objeto;
     }
+    
+    public Object getObjectCriterioWithoutLazyObjects(String tabla, Map<String, String> criterios, String... metodos) {
+        Session session = HibernateUtil.getSessionFactory().openSession();
+        Transaction tx = null;
+
+        Object objeto = null;
+
+        String condicion = " WHERE ";
+        int size = criterios.size();
+        int actual = 0;
+
+        for (Map.Entry<String, String> entry : criterios.entrySet()) {
+            String key = entry.getKey();
+            condicion += key + "=:param" + actual;
+            actual++;
+            if (actual != size) {
+                condicion += " AND ";
+            }
+        }
+
+        try {
+            tx = session.beginTransaction();
+            Query query = session.createQuery("FROM " + tabla + condicion);
+            actual=0;
+            for (Map.Entry<String, String> entry : criterios.entrySet()) {
+                String value = entry.getValue();
+                query.setString("param"+actual, value);
+                actual++;
+            }
+            objeto = query.uniqueResult();
+            
+            if (objeto!=null) {
+                // Forzamos a Hibernate a ejecutar ciertos métodos para tomarlo del servidor
+                for (String m : metodos) {
+                    Method meth = objeto.getClass().getMethod(m);
+                    Object t = meth.invoke(objeto);
+
+                    if (t!=null) 
+                        t.toString();
+                }
+            }
+            
+            tx.commit();
+        } catch (HibernateException | NoSuchMethodException | SecurityException | IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
+            if (tx != null) {
+                tx.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
+
+        return objeto;
+    }
 
     public List getObjects(String tabla) {
         return getObjects(tabla, "");
@@ -148,14 +202,16 @@ public class HibernateManager {
             tx = session.beginTransaction();
             objetos = session.createQuery("FROM " + tabla + " " + consulta).list();
             
-            for (Object o : objetos) {
-                // Forzamos a Hibernate a ejecutar ciertos métodos para tomarlo del servidor
-                for (String m : methods) {
-                    Method meth = o.getClass().getMethod(m);
-                    Object t = meth.invoke(o);
-                    
-                    if (t!=null) 
-                        t.toString();
+            if (objetos!=null) {
+                for (Object o : objetos) {
+                    // Forzamos a Hibernate a ejecutar ciertos métodos para tomarlo del servidor
+                    for (String m : methods) {
+                        Method meth = o.getClass().getMethod(m);
+                        Object t = meth.invoke(o);
+
+                        if (t!=null) 
+                            t.toString();
+                    }
                 }
             }
             tx.commit();

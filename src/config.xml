@@ -96,7 +96,7 @@
                 <role name="directivo" />
             </white-list>
         </mapping>
-        <mapping link="getCliente" className="controller.UsuarioController" method="getCliente" return="map" token="false">
+        <mapping link="getCliente" className="controller.UsuarioController" method="getCliente" return="map" token="true">
             <params>
                 <param type="parameters" />
             </params>
@@ -148,7 +148,7 @@
                 <role name="directivo" />
             </white-list>
         </mapping>
-        <mapping link="enviarParte" className="controller.TareaController" method="enviarParteTarea" return="map" token="true">
+        <mapping link="getTarea" className="controller.TareaController" method="getTarea" return="map" token="true">
             <params>
                 <param type="parameters" />
             </params>
@@ -158,7 +158,50 @@
                 <role name="directivo" />
             </white-list>
         </mapping>
-        
+        <mapping link="getAllTareas" className="controller.TareaController" method="cogerTodasLasTareasDelServidor" return="map" token="true">
+            <white-list>
+                <role name="tecnico" />
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="enviarParte" className="controller.TareaController" method="enviarParteTarea" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="tecnico" />
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>ç
+        <mapping link="deleteTarea" className="controller.TareaController" method="deleteTarea" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="createTarea" className="controller.TareaController" method="createTarea" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="updateTarea" className="controller.TareaController" method="updateTarea" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
         
         <!-- Métodos para las Scooters -->
         <mapping link="loginScooter" className="controller.ScooterController" method="login" return="map" token="false">
@@ -253,6 +296,15 @@
                 <role name="directivo" />
             </white-list>
         </mapping>
+        <mapping link="bajaScooter" className="controller.ScooterController" method="darBajaScooter" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
         
         <!-- Métodos para los bonos -->
         <mapping link="getBonos" className="controller.BonoController" method="getBonos" return="map" token="true">
@@ -330,7 +382,7 @@
                 <param type="parameters" />
             </params>
         </mapping>
-        <mapping link="desconectarEmpleado" className="controller.EmpleadoController" method="desconectar" return="map" token="false">
+        <mapping link="desconectarEmpleado" className="controller.EmpleadoController" method="desconectar" return="map" token="true">
             <params>
                 <param type="parameters" />
             </params>
@@ -340,13 +392,13 @@
                 <role name="directivo" />
             </white-list>
         </mapping>
-        <mapping link="getEmpleados" className="controller.EmpleadoController" method="getEmpleados" return="map" token="false">
+        <mapping link="getEmpleados" className="controller.EmpleadoController" method="getEmpleados" return="map" token="true">
             <white-list>
                 <role name="administrador" />
                 <role name="directivo" />
             </white-list>
         </mapping>
-        <mapping link="getEmpleado" className="controller.EmpleadoController" method="getEmpleado" return="map" token="false">
+        <mapping link="getEmpleado" className="controller.EmpleadoController" method="getEmpleado" return="map" token="true">
             <params>
                 <param type="parameters" />
             </params>
@@ -423,6 +475,24 @@
             </white-list>
         </mapping>
         <mapping link="getModelos" className="controller.ItemReducidoController" method="getModelos" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="getTipoTareas" className="controller.ItemReducidoController" method="getTipoTareas" return="map" token="true">
+            <params>
+                <param type="parameters" />
+            </params>
+            <white-list>
+                <role name="administrador" />
+                <role name="directivo" />
+            </white-list>
+        </mapping>
+        <mapping link="getEstadoTareas" className="controller.ItemReducidoController" method="getEstadoTareas" return="map" token="true">
             <params>
                 <param type="parameters" />
             </params>

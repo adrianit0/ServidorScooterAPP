@@ -82,9 +82,9 @@ public class UsuarioController extends GenericController implements IUsuarioCont
     public Map<String, String> desconectar(Map<String, String> parameters) throws ServerExecutionException {
         Integer idThread = Integer.parseInt(parameters.get("idThread"));
         
-        boolean desconectado = this.getServer().desconectarUsuario(idThread);
+        int desconectado = this.getServer().desconectarUsuario(idThread);
         
-        if (!desconectado)
+        if (desconectado==0)
             throw new ServerExecutionException ("Error al intentar desconectar del servidor");
         
         Map<String, String> result = new HashMap<>();

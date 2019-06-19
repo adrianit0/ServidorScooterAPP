@@ -63,7 +63,7 @@ public class ScooterServerThread extends Thread {
 
                 outputLine = ejecutarMetodo (inputLine);
                 
-                out.println(outputLine);
+                enviarMensaje(outputLine);
             } catch (IOException e) {
                 System.err.println("ScooterServerThread::run: No se ha podido realizar la consulta: " + e.getMessage());
                 listening=false;
@@ -71,11 +71,11 @@ public class ScooterServerThread extends Thread {
         }
         
         try {
-            boolean desconectado = servidor.desconectarUsuario(idThread);
+            int desconectados = servidor.desconectarUsuario(idThread);
             socket.close();
             
-            if (desconectado) {
-                System.out.println("ScooterServerThread::run: Thread cerrado satisfactoriamente");
+            if (desconectados>0) {
+                System.out.println("ScooterServerThread::run: Thread cerrado satisfactoriamente. Closed: " + desconectados);
             } else {
                 System.out.println("ScooterServerThread::run: Thread cerrado, pero no se ha podido eliminar su información de sesión");
             }
@@ -83,6 +83,10 @@ public class ScooterServerThread extends Thread {
         } catch (IOException e) {
             System.err.println("ScooterServerThread::run: No se puede cerrar el thread: " + e.getMessage() ) ;
         }
+    }
+    
+    public synchronized void enviarMensaje (String mensaje) {
+        out.println(mensaje);
     }
     
     /**
@@ -176,5 +180,9 @@ public class ScooterServerThread extends Thread {
 
         // Se devuelve
         return packed;
+    }
+
+    public Socket getSocket() {
+        return socket;
     }
 }

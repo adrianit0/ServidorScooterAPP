@@ -139,7 +139,7 @@ public class Util {
                 if (type.length<2) {
                     // NO ES UN ARGUMENTO.
                     // TODO: devolver correctamente el mensaje de error
-                    System.err.println("La variable " + decoded[i] + " no es un parametro");
+                    System.err.println("La variable " + decoded[i] + " no es un parametro o este se encuentra vacío");
                     continue;
                 }
                 
@@ -448,6 +448,11 @@ public class Util {
                             case "Boolean":
                             case "boolean":
                                 objectConverted = Boolean.parseBoolean(parametro);
+                                break;
+                            case "Long":
+                            case "long":
+                                objectConverted = Long.parseLong(parametro);
+                                break;
                             default:
                                 System.err.println("Util::convertMapToObject error: "+returnType.getCanonicalName() + " no es compatible con el parseo");
                                 break;

@@ -58,7 +58,10 @@ public class Modelo  implements java.io.Serializable {
         this.scooters = scooters;
     }
 
-
+    @Override
+    public String toString() {
+        return marca + " " + modelo;
+    }
 
 
 }

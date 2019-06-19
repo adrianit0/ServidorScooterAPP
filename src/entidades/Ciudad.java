@@ -66,9 +66,10 @@ public class Ciudad  implements java.io.Serializable {
         this.empleados = empleados;
     }
 
-
-
-
+    @Override
+    public String toString() {
+        return nombre + " (" + provincia + ")";
+    }
 }
 
 

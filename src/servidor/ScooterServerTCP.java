@@ -14,7 +14,9 @@ import entidades.Cliente;
 import entidades.Estadoalquiler;
 import entidades.Scooter;
 import excepciones.AlquilerException;
+import excepciones.ServerExecutionException;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.Date;
@@ -29,7 +31,9 @@ import java.util.logging.Logger;
 import util.Constantes;
 import util.HibernateManager;
 import util.HibernateUtil;
+import util.PaqueteCliente;
 import util.Util;
+import util.Util.CODIGO;
 
 /**
  *
@@ -43,7 +47,7 @@ public class ScooterServerTCP extends Thread{
     
     private ArrayList<Scooter> scooters;
     private LinkedHashMap<String, ClienteInfo> usuariosConectados; 
-    private LinkedHashMap<Integer, Socket> socketsConectados;
+    private LinkedHashMap<Integer, ScooterServerThread> socketsConectados;
     private LinkedHashMap<String, Alquiler> alquileres;
     
     private HibernateManager hibernateManager;
@@ -125,8 +129,9 @@ public class ScooterServerTCP extends Thread{
                 throw new RuntimeException("El cliente no puede conectarse - Error", e);
             }
             Integer idThread = clientSocket.hashCode();
-            socketsConectados.put(idThread, clientSocket);
-            new ScooterServerThread(clientSocket, idThread, this).start();
+            ScooterServerThread thread = new ScooterServerThread(clientSocket, idThread, this);
+            socketsConectados.put(idThread, thread);
+            thread.start();
         }
         System.out.println("Servidor apagando...") ;
         
@@ -333,6 +338,24 @@ public class ScooterServerTCP extends Thread{
         return alquiler;
     }
     
+    // Envia un mensaje a otro socket, como el método enviarMensaje es synchronized no hay problemas de que haya conflicto de sockets
+    public synchronized void sendMessageToSocket(Integer idThread, String idPaquete, Map<String,String> parametros, CODIGO codigo) throws ServerExecutionException{
+        ScooterServerThread threadSocket = socketsConectados.get(idThread);
+        if (threadSocket==null) {
+            throw new ServerExecutionException ("No existe el thread del socket ha buscar");
+        }
+        PaqueteCliente packCliente = new PaqueteCliente();
+        packCliente.setIdPaquete(idPaquete);
+        packCliente.setArgumentos(parametros);
+        packCliente.setCodigo(codigo);
+        
+        // lo empaquetamos
+        String packed = Util.packFromClient(packCliente);
+        threadSocket.enviarMensaje(packed);
+        
+        System.out.println("Paquete enviado correctamente a su dueño " + idThread + " -> " + idPaquete);
+    }
+    
     public synchronized Alquiler getAlquiler (String nick) {
         return alquileres.get(nick);
     }
@@ -425,7 +448,7 @@ public class ScooterServerTCP extends Thread{
     public synchronized String conectarUsuario(ClienteInfo info) {
         // Si ya estuviera en la lista miramos si no se le ha caducado aún el token
         // de esta manera puede recuperarla
-        // ¿Tal vez deba eliminar el token y dar otro para evitar que 2 personas con el mismo token jueguen
+        // ¿Tal vez deba eliminar el token y dar otro para evitar que 2 personas con el mismo token esten
         // usando la misma cuenta?
         String token = containsName(info.getNombre());
         if (token != null) {
@@ -445,44 +468,47 @@ public class ScooterServerTCP extends Thread{
         return token;
     }
     
-    public synchronized boolean desconectarUsuario (Integer idThread) {
+    public synchronized int desconectarUsuario (Integer idThread) {
         if (idThread==null) {
             System.err.println("ScooterServerTCP::desconectarUsuario: No se ha enviado ningún id Thread");
-            return false;
+            return 0;
         }
         
         if (socketsConectados.containsKey(idThread)) {
-            ClienteInfo info = null;
+            List<ClienteInfo> info = new ArrayList<>();
             // Buscamos el usuario si está incluido
             for (Map.Entry<String, ClienteInfo> entry : usuariosConectados.entrySet()) {
                 ClienteInfo value = entry.getValue();
                 
                 if (value!=null && value.getIdThread()!=null && value.getIdThread().equals(idThread)) {
-                    info = value;
-                    break;
+                    info.add(value);
                 }
             }
             
-            if (info==null)
-                return false;
+            if (info.isEmpty()) 
+                return 0;
             
             // Si es una scooter desconectamos tambien su estado
-            if (info.getRol()==Rol.SCOOTER) {
-                for (int i = 0; i < scooters.size(); i++) {
-                    if (scooters.get(0).getId().equals(info.getId())) {
-                        scooters.remove(scooters.get(0));
-                        break;
+            for (ClienteInfo c : info) {
+                if (c.getRol()==Rol.SCOOTER) {
+                    for (int i = 0; i < scooters.size(); i++) {
+                        if (scooters.get(i).getId().equals(c.getId()))  {
+                            scooters.remove(i);
+                            i--;
+                            System.out.println("Scooter nº" + i +" eliminada");
+                        }
+                            
                     }
+                } else {
+                    // No desconectaremos el infoClient si no es una scooter, tan solo dejaremos idThread en null
+                    c.setIdThread(null);
                 }
             }
             
-            // No desconectaremos el infoClient, tan solo dejaremos idThread en null
-            info.setIdThread(null);
-            
-            return true;
+            return info.size();
         }
         
-        return false;
+        return 0;
     }
     
     /**

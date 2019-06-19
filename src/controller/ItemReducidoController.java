@@ -39,9 +39,23 @@ public class ItemReducidoController extends GenericController {
     }
     
     public Map<String,String> getModelos (Map<String,String> parametros) throws ServerExecutionException {
-        List sedes = this.getMh().getObjects("Modelo");
+        List modelos = this.getMh().getObjects("Modelo");
         
-        Map<String,String> resultado = util.Util.convertListToMap(sedes);
+        Map<String,String> resultado = util.Util.convertListToMap(modelos);
         return resultado;
-    }   
+    }
+    
+    public Map<String,String> getTipoTareas (Map<String,String> parametros) throws ServerExecutionException {
+        List tipoTareas = this.getMh().getObjects("Tipotarea");
+        
+        Map<String,String> resultado = util.Util.convertListToMap(tipoTareas);
+        return resultado;
+    }
+    
+    public Map<String,String> getEstadoTareas (Map<String,String> parametros) throws ServerExecutionException {
+        List estadoTareas = this.getMh().getObjects("Estadotarea");
+        
+        Map<String,String> resultado = util.Util.convertListToMap(estadoTareas);
+        return resultado;
+    }
 }

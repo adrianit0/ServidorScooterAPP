@@ -28,6 +28,8 @@ public class Scooter {
      private Set sedes = new HashSet(0);
      @Ignore
      private Set mantenimientos = new HashSet(0);
+     @Ignore
+     private Integer noThread;
 
     public Scooter() {
         
@@ -167,6 +169,15 @@ public class Scooter {
         this.mantenimientos = mantenimientos;
     }
 
+    public Integer getNoThread() {
+        return noThread;
+    }
+
+    public void setIdThread(Integer noThread) {
+        this.noThread = noThread;
+    }
+
+    
     @Override
     public String toString() {
         return "Scooter{" + "noSerie=" + noSerie + '}';

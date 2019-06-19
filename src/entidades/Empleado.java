@@ -30,6 +30,9 @@ public class Empleado  implements java.io.Serializable {
     public Empleado() {
     }
 
+    public Empleado(Integer id) {
+        this.id = id;
+    }
 	
     public Empleado(Ciudad ciudad, Puesto puesto, Sede sede, String nombre, String apellido1, String dni, String direccion, String email, String pass, double sueldo) {
         this.ciudad = ciudad;

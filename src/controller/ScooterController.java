@@ -21,6 +21,7 @@ import java.util.List;
 import java.util.Map;
 import servidor.ClienteInfo;
 import util.HibernateManager;
+import util.Util.CODIGO;
 
 /**
  *
@@ -53,19 +54,18 @@ public class ScooterController extends GenericController {
             throw new ServerExecutionException("Scooter no tiene no de serie");
         }
         
-        Map<String,String> criterios = new HashMap<String,String>();
-        
-        criterios.put("noSerie", noSerie);
-        Scooter scooter = (Scooter) this.getMh().getObjectCriterio("Scooter", criterios);
+        Map<String,String> criterio = new HashMap<>();
+        criterio.put("codigo", codigo+"");
+        Scooter scooter = (Scooter) this.getMh().getObjectCriterioWithoutLazyObjects("Scooter", criterio, "getModelo");
         
         // La scooter no existe
         if (scooter==null) {
             System.out.println("La scooter con noSerie "+ noSerie+" no existe, se procederá a registrarla");
             Scooter nScooter = new Scooter();
             
-            criterios = new HashMap<>();
-            criterios.put("codigo", codigo+"");
-            scooter=(Scooter) this.getMh().getObjectCriterio("Scooter", criterios);
+            criterio = new HashMap<>();
+            criterio.put("codigo", codigo+"");
+            scooter=(Scooter) this.getMh().getObjectCriterioWithoutLazyObjects("Scooter", criterio, "getModelo");
             if (scooter!=null) {
                 throw new ServerExecutionException("Se intenta crear una Scooter con un código que tiene otra Scooter. Cambiale el código.");
             }
@@ -77,7 +77,7 @@ public class ScooterController extends GenericController {
             
             nScooter.setCodigo(codigo);
             nScooter.setModelo(modeloScooter);
-            nScooter.setMatricula(codigo+""); // CAMBIAR POR MATRICULA
+            nScooter.setMatricula(codigo+""); // CAMBIAR POR MATRICULA EN AJUSTES, EL SOFTWARE DE LA SCOOTER NO SABE LA MATRICULA QUE TIENE
             nScooter.setNoSerie(noSerie);
             nScooter.setPosicionLon(longitud);
             nScooter.setPosicionLat(latitud);
@@ -92,6 +92,8 @@ public class ScooterController extends GenericController {
             
             nScooter.setId(id);
             scooter = nScooter;
+        } else if (scooter.getFechaBaja()!=null) {
+            throw new ServerExecutionException ("La scooter se ha dado de baja el día: " + scooter.getFechaBaja().toString(), util.Util.CODIGO.notFound);
         } else {
             scooter.setPosicionLon(longitud);
             scooter.setPosicionLat(latitud);
@@ -101,6 +103,7 @@ public class ScooterController extends GenericController {
         
         scooter.setBateria(bateria);
         scooter.setBloqueada(false);
+        scooter.setIdThread(idThread);
         
         ClienteInfo info = new ClienteInfo();
         info.setId(scooter.getId());
@@ -139,15 +142,25 @@ public class ScooterController extends GenericController {
         // FILTRAR
         List<Scooter> encontradas = new ArrayList<>();
         for (Scooter s : scooters) {
-            if (s.isBloqueada())
+            if (s.isBloqueada() && 
+                    isInRange(lat, s.getPosicionLat()-diferencia, s.getPosicionLat()+diferencia) &&
+                    isInRange(lon, s.getPosicionLon()-diferencia, s.getPosicionLon()+diferencia) )
                 continue;
             encontradas.add(s);
         }
         
         Map<String,String> lista = util.Util.convertListToMap(encontradas);
-        lista.put("length", encontradas.size()+"");
+        int i = 0;
+        for (Scooter s : encontradas) {
+            lista.put("modelo[" + i + "]", s.getModelo().toString());
+            i++;
+        }
         
         return lista;
+    }
+    
+    private static boolean isInRange (Double valor, Double valorMenor, Double valorMayor) {
+        return valor>=valorMenor && valor<=valorMayor;
     }
     
     public Map<String,String> getScooterById (Map<String,String> parametros ) throws ServerExecutionException {
@@ -259,6 +272,20 @@ public class ScooterController extends GenericController {
             throw new ServerExecutionException (e.getMessage());
         }
         
+        // Le mandamos la señal a la scooter para que se encienda
+        Map<String,String> scooterParametros = new HashMap<>();
+        scooterParametros.put("status", "ok");
+        String idPaquete = "desbloquear"+scooter.getCodigo();
+        CODIGO cod = CODIGO.ok;
+        
+        try {
+            this.getServer().sendMessageToSocket(scooter.getNoThread(), idPaquete, scooterParametros, cod);
+        } catch (ServerExecutionException e) {
+            System.err.println("Error thread: " + e.getMessage());
+            throw new ServerExecutionException ("No se ha podido encender la scooter");
+        }
+        // fin señal
+        
         Map<String,String> resultado = new HashMap<>();
         resultado.put("status", "ok");
         
@@ -278,6 +305,19 @@ public class ScooterController extends GenericController {
         
         if (alquiler==null)
             throw new ServerExecutionException ("No existe alquiler para este usuario");
+        
+        // Le mandamos la señal a la scooter para que se encienda
+        Map<String,String> scooterParametros = new HashMap<>();
+        scooterParametros.put("status", "ok");
+        String idPaquete = "bloquear"+alquiler.getScooter().getCodigo();
+        CODIGO cod = CODIGO.ok;
+        try {
+            this.getServer().sendMessageToSocket(alquiler.getScooter().getNoThread(), idPaquete, scooterParametros, cod);
+        } catch (ServerExecutionException e) {
+            System.err.println("Error thread: " + e.getMessage());
+            throw new ServerExecutionException ("No se ha podido apagar la scooter");
+        }
+        // fin señal
         
         Cliente cliente = alquiler.getCliente();
         
@@ -334,6 +374,30 @@ public class ScooterController extends GenericController {
             throw new ServerExecutionException ("No se ha podido eliminar la scooter", parametros);
         
         Map<String,String> result = util.Util.convertObjectToMap(scooter);
+        return result;
+    }
+    
+    public Map<String,String> darBajaScooter (Map<String,String> parametros) throws ServerExecutionException {
+        Integer id = Integer.parseInt(parametros.get("id"));
+        
+        HibernateManager hm = this.getHManager();
+        Scooter scooter = (Scooter) hm.getObject(Scooter.class, id);
+        
+        if (scooter==null)
+            throw new ServerExecutionException("La scooter no existe");
+        
+        if (scooter.getFechaBaja()!=null)
+            throw new ServerExecutionException("La scooter ya estaba dado de baja");
+        
+        scooter.setFechaBaja(new Date(System.currentTimeMillis()));
+        boolean editado = hm.updateObject(scooter);
+        
+        if (!editado)
+            throw new ServerExecutionException ("No se ha podido dar de baja a la scooter", parametros);
+        
+        Map<String,String> result = new HashMap<>();
+        result.put("status", "ok");
+        
         return result;
     }
     

@@ -22,6 +22,7 @@ import java.util.Optional;
 import servidor.ClienteInfo;
 import util.Enums.*;
 import util.HibernateManager;
+import util.Util;
 
 /**
  *
@@ -119,14 +120,14 @@ public class TareaController extends GenericController {
                 case 3:
                 case 4:
                     if (tecnicosMantenimiento==null || tecnicosMantenimiento.isEmpty()) 
-                        throw new ServerExecutionException("No hay suficientes tecnicos de recogida.");
+                        throw new ServerExecutionException("No hay suficientes tecnicos de mantenimiento.");
                     tecnico=tecnicosMantenimiento.get(i%tecnicosMantenimiento.size());
                     break;
                 case 5:
                 case 6:
                 case 7:
                     if (tecnicosMecanicos==null || tecnicosMecanicos.isEmpty()) 
-                        throw new ServerExecutionException("No hay suficientes tecnicos de recogida.");
+                        throw new ServerExecutionException("No hay suficientes tecnicos mecánicos.");
                     tecnico=tecnicosMecanicos.get(i%tecnicosMecanicos.size());
                     break;
                     
@@ -176,6 +177,35 @@ public class TareaController extends GenericController {
         return result;
     }
     
+    public Map<String,String> cogerTodasLasTareasDelServidor () throws ServerExecutionException {
+        List<Tarea> tareas = getMh().getObjects("Tarea");
+        if (tareas==null||tareas.isEmpty())
+            throw new ServerExecutionException("No hay tareas en el servidor");
+        Map<String,String> result = util.Util.convertListToMap(tareas);
+        int i=0;
+        for (Tarea t : tareas) {
+            result.put("fechaAsignacion["+i+"]", t.getFechaAsignacion().getTime()+"");
+            i++;
+        }
+        return result;
+    }
+    
+    public Map<String, String> getTarea(Map<String,String> parametros) throws ServerExecutionException {
+        Integer id = Integer.parseInt(parametros.get("id"));
+        
+        Tarea tarea = (Tarea) this.getHManager().getObjectWithoutLazyObjects(Tarea.class, id, "getTipotarea", "getEstadotarea", "getEmpleado");
+        
+        if (tarea==null) 
+            throw new ServerExecutionException ("No se ha encontrado la tarea con ID " + id);
+        
+        Map<String, String> result = util.Util.convertObjectToMap(tarea);
+        result.put("tipoTareaId", tarea.getTipotarea().getId()+"");
+        result.put("empleadoId", tarea.getEmpleado().getId()+"");
+        result.put("estadoTareaId", tarea.getEstadotarea().getId()+"");
+        result.put("fechaAsignacion", tarea.getFechaAsignacion().getTime()+"");
+        return result;
+    }
+    
     public Map<String,String> enviarParteTarea (Map<String,String> parametros) throws ServerExecutionException {
         String token = parametros.get("token");
         ClienteInfo info = getServer().getClient(token);
@@ -188,9 +218,9 @@ public class TareaController extends GenericController {
             observaciones="";
         boolean opcion = parametros.get("opcion").equals("si");
         
-        Tarea tarea = (Tarea) getMh().getObjectWithoutLazyObjects(Tarea.class, id, "getEstadotarea");
-        if(tarea.getTipotarea().getId()!=1) {
-            switch (tarea.getTipotarea().getId()) {
+        Tarea tarea = (Tarea) getMh().getObjectWithoutLazyObjects(Tarea.class, id, "getEstadotarea", "getMantenimiento");
+        if(tarea.getEstadotarea().getId()!=1) {
+            switch (tarea.getEstadotarea().getId()) {
                 case 2: throw new ServerExecutionException("Esta tarea ha sido aplazada, intentelo más tarde.");
                 case 3: throw new ServerExecutionException("Esta tarea ha sido transferia a otro empleado.");
                 case 4: throw new ServerExecutionException("Esta tarea ya ha sido finalizada.");
@@ -282,7 +312,7 @@ public class TareaController extends GenericController {
                 // DAR EL MANTENIMIENTO COMO TERMINADO
                 break;
             case CAMBIAR_BATERIAS:
-                if (!terminadoCorrectamente)
+                if (terminadoCorrectamente)
                     nuevaTarea = TipoTareaEnum.DEVOLVER_SCOOTER_CALLE;
                 // SI LA SCOOTER ESTUVIERA YA EN LA CALLE, DAR COMO TERMINADO
                 break;
@@ -298,7 +328,14 @@ public class TareaController extends GenericController {
             case ESTIMAR_GASTOS:
                 if (terminadoCorrectamente) 
                     nuevaTarea = TipoTareaEnum.REPARAR_SCOOTER;
-                // SI NO ES RENTABLE DAR LA SCOOTER DE BAJA
+                else {
+                    // Si no es rentable economicamente arreglar la scooter la damos de baja
+                    Mantenimiento m = (Mantenimiento) getMh().getObjectWithoutLazyObjects(Mantenimiento.class, oldTarea.getMantenimiento().getId(), "getScooter");
+                    Scooter scooter = (Scooter) getMh().getObject(Scooter.class, m.getScooter().getId());
+                    
+                    scooter.setFechaBaja(new Date(System.currentTimeMillis()));
+                    getMh().updateObject(scooter);
+                }
                 break;
         }
         
@@ -306,5 +343,81 @@ public class TareaController extends GenericController {
             return null;
         
         return generarTarea (nuevaTarea, oldTarea);
+    }
+    
+    // CRUD TAREA
+    public Map<String,String> createTarea (Map<String,String> parametros) throws ServerExecutionException {
+        Tarea tarea = (Tarea) util.Util.convertMapToObject(Tarea.class, parametros);
+        
+        HibernateManager hm = this.getHManager();
+        
+        Integer estadoTareaId = Util.parseInt(parametros.get("estadoTareaId"));
+        Integer tipoTareaId = Util.parseInt(parametros.get("tipoTareaId"));
+        Integer empleadoId = Util.parseInt(parametros.get("empleadoId"));
+        Long fechaAsignacion = Long.parseLong(parametros.get("fechaAsignacion"));
+        
+        Estadotarea estadoTarea = (Estadotarea) hm.getObject(Estadotarea.class, estadoTareaId);
+        Tipotarea tipoTarea = (Tipotarea) hm.getObject(Tipotarea.class, tipoTareaId);
+        Empleado empleado = (Empleado) hm.getObject(Empleado.class, empleadoId);
+        
+        tarea.setEstadotarea(estadoTarea);
+        tarea.setTipotarea(tipoTarea);
+        tarea.setEmpleado(empleado);
+        tarea.setFechaAsignacion(new Date(fechaAsignacion));
+        
+        Integer id = hm.addObject(tarea);
+        
+        if (id==-1)
+            throw new ServerExecutionException ("No se ha podido crear la tarea", parametros);
+        
+        
+        tarea.setId(id);
+        Map<String,String> result = util.Util.convertObjectToMap(tarea);
+        return result;
+    }
+    
+    public Map<String,String> updateTarea (Map<String,String> parametros) throws ServerExecutionException {
+        Tarea tarea = (Tarea) util.Util.convertMapToObject(Tarea.class, parametros);
+        
+        HibernateManager hm = this.getHManager();
+        Tarea lastTarea = (Tarea) hm.getObjectWithoutLazyObjects(Tarea.class, tarea.getId(), "getEstadotarea", "getTipotarea", "getEmpleado");
+        
+        Integer estadoTareaId = Util.parseInt(parametros.get("estadoTareaId"));
+        Integer tipoTareaId = Util.parseInt(parametros.get("tipoTareaId"));
+        Integer empleadoId = Util.parseInt(parametros.get("EmpleadoId"));
+        Long fechaAsignacion = Long.parseLong(parametros.get("fechaAsignacion"));
+        Date fechaA = new Date(fechaAsignacion);
+        
+        if (tarea.getObservaciones()==null) 
+            tarea.setObservaciones(lastTarea.getObservaciones());
+        
+        tarea.setEstadotarea(estadoTareaId!=null? new Estadotarea(estadoTareaId) : lastTarea.getEstadotarea());
+        tarea.setTipotarea(tipoTareaId!=null? new Tipotarea(tipoTareaId) : lastTarea.getTipotarea());
+        tarea.setEmpleado(empleadoId!=null? new Empleado(empleadoId) : lastTarea.getEmpleado());
+        tarea.setFechaAsignacion(fechaA);
+        tarea.setMantenimiento(lastTarea.getMantenimiento());
+        
+        Boolean editado = hm.updateObject(tarea);
+        
+        if (!editado)
+            throw new ServerExecutionException ("No se ha podido editar la tarea", parametros);
+        
+        Map<String,String> result = util.Util.convertObjectToMap(tarea);
+        return result;
+    }
+    
+    public Map<String,String> deleteTarea (Map<String,String> parametros) throws ServerExecutionException {
+        Integer id = Integer.parseInt(parametros.get("id"));
+        
+        HibernateManager hm = this.getHManager();
+        Tarea tarea = (Tarea) hm.getObject(Tarea.class, id);
+        Boolean editado = hm.deleteObject(tarea);
+        
+        if (!editado)
+            throw new ServerExecutionException ("No se ha podido eliminar la tarea", parametros);
+        
+        Map<String,String> result = new HashMap<>();
+        result.put("status", "ok");
+        return result;
     }
 }
